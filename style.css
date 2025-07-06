@@ -1,0 +1,116 @@
+/* Custom Styles - New Theme */
+:root {
+  --feather-color: #359fb7;
+  --olive-color: #8f853e;
+  --black-color: #61646b;
+  --red-color: #c0414a;
+}
+
+body {
+    padding-top: 70px; /* Adjust this value based on header height */
+}
+
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--feather-color) 0%,   /* Feather */
+    var(--olive-color) 50%,  /* Olive */
+    var(--black-color) 100%  /* Black */
+  );
+}
+.product-card:hover .product-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+.product-overlay {
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.language-dropdown {
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: top;
+  opacity: 0;
+  transform: scaleY(0.95);
+}
+.group:hover .language-dropdown {
+  pointer-events: auto;
+  opacity: 1;
+  transform: scaleY(1);
+}
+.nav-link {
+  position: relative;
+}
+.nav-link:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--red-color); /* Red */
+  transition: width 0.3s ease;
+}
+.nav-link:hover:after {
+  width: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Modal Animation */
+@keyframes scale-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+.animate-scale-out {
+  animation: scale-out 0.3s ease-in forwards;
+}
+
+/* Mobile Menu Body Shift */
+body.mobile-menu-open #main-content,
+body.mobile-menu-open #footer-placeholder {
+  transition: transform 0.4s ease-in-out;
+  transform: translateY(20px); /* Reduced shift for less page displacement */
+}
+
+#main-content,
+#footer-placeholder {
+  transition: transform 0.4s ease-in-out;
+}
+
+
+.award-bg {
+  background-size: cover;
+  background-position: center;
+}
+
+.award-bg:hover {
+  background-position: center 50%;
+  transition: background-position 0.5s ease-in-out;
+}
+

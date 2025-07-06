@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="Assets/logo.jpg" />
+    <title>BAKO lubricants LLC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="font-sans antialiased text-gray-800">
+    <!-- Header Section -->
+    <div id="header-placeholder"></div>
+
+    <!-- Contact Form Section -->
+    <div class="container mx-auto px-2 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 ">
+      <div class="max-w-xl mx-auto ">
+
+        <div class="text-center mb-12 ">
+          <h1
+            class="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight "
+            data-i18n="Send a Message"
+          >
+            Send a Message
+          </h1>
+          <p
+            class="mt-4 text-lg text-gray-600"
+            data-i18n="Your message will be sent directly to our inbox."
+          >
+            Your message will be sent directly to our inbox.
+          </p>
+        </div>
+
+        <!-- Main Content: Simplified Form -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div class="p-8 sm:p-12 lg:p-16">
+            <!-- The form now only contains the message and button -->
+            <form id="contact-form" class="space-y-6">
+              <div>
+                <label
+                  for="message"
+                  class="block text-sm font-medium text-gray-700"
+                  data-i18n="Message"
+                  >Message</label
+                >
+                <div class="mt-1">
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="6"
+                    required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 px-4 border"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="flex justify-end">
+                <button
+                  type="submit"
+                  class="w-full inline-flex items-center justify-center rounded-md border border-transparent bg-[var(--black-color)] px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-[var(--red-color)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all sm:w-auto"
+                  data-i18n="Send Message"
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div id="footer-placeholder"></div>
+
+    <script src="main.js"></script>
+
+   <!-- About Modal -->
+    <div
+      id="about-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300"
+    >
+      <div
+        class="hero-gradient rounded-lg shadow-lg p-8 w-11/12 md:w-1/2 relative transform scale-95 transition-transform duration-300 text-white"
+      >
+        <button
+          id="close-about-modal"
+          class="absolute top-2 right-2 text-white hover:text-gray-300 text-xl"
+        >
+          &times;
+        </button>
+        <div id="about-modal-placeholder"></div>
+        <button
+          id="close-about-modal-button"
+          class="mt-6 bg-white/20 text-white px-4 py-2 rounded hover:bg-white/30"
+          data-i18n="Close"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

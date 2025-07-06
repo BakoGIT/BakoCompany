@@ -1,0 +1,163 @@
+<header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <!-- Logo -->
+    <div class="flex items-center">
+      <a href="index.html" class="flex items-center">
+        <img
+          src="Assets/logo.jpg"
+          alt="Bako Logo"
+          class="h-12 p-1 rounded"
+          style="
+            background: linear-gradient(
+              90deg,
+              var(--feather-color) 0%,
+              var(--olive-color) 100%
+            );
+          "
+        />
+        <span
+          class="ml-2 text-xl font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+          >BAKO</span
+        >
+      </a>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex space-x-8">
+      <a
+        href="index.html"
+        class="nav-link bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] font-medium"
+        data-i18n="HOME"
+        >HOME</a
+      >
+      <a
+        href="products.html"
+        class="nav-link bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] font-medium"
+        data-i18n="PRODUCTS"
+        >Products</a
+      >
+      <a
+        href="Certificates.html"
+        class="nav-link bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] font-medium"
+        data-i18n="CERTIFICATES"
+        >Certificates</a
+      >
+      <a
+        href="contact.html"
+        class="nav-link bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] font-medium"
+        data-i18n="Contact Us"
+        >Contact Us</a
+      >
+      <a
+        href="index.html#About-Section"
+        class="nav-link bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] font-medium"
+        data-i18n="ABOUT"
+        >ABOUT</a
+      >
+    </nav>
+
+    <!-- Language Selector -->
+    <div class="language-selector relative flex hidden md:flex">
+      <button
+        id="open-lang-modal"
+        class="flex items-center bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent hover:from-[var(--feather-color)] hover:via-[var(--olive-color)] hover:to-[var(--red-color)] focus:outline-none cursor-pointer transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100"
+      >
+        <i class="fas fa-globe mr-1"></i>
+        <span>Language</span>
+      </button>
+    </div>
+
+    <!-- Language Modal -->
+    <div
+      id="lang-modal"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-lg p-8 w-80 relative">
+        <button
+          id="close-lang-modal"
+          class="absolute top-2 right-2 text-gray-500 hover:text-[var(--red-color)] text-xl"
+        >
+          &times;
+        </button>
+        <h2
+          class="text-xl font-bold mb-4 text-[var(--feather-color)]"
+          data-i18n="Select Language"
+        >
+          Select Language
+        </h2>
+        <div class="flex flex-col gap-4">
+          <button
+            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
+            data-lang="en"
+            data-i18n="English"
+          >
+            English
+          </button>
+          <button
+            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
+            data-lang="ko"
+            data-i18n="Korean"
+          >
+            한국어
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-button"
+      class="md:hidden text-[var(--feather-color)]"
+    >
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden bg-white border-t transform origin-top transition-all duration-300 fade-in scale-y-0"
+  >
+    <div class="container mx-auto px-4 py-2 flex flex-col">
+      <div class="py-2 flex flex-row justify-between items-center py-1">
+        <a
+          href="index.html"
+          class="font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+          data-i18n="HOME"
+          >HOME</a
+        >
+        <button
+          id="open-lang-modal-mobile"
+          class="flex items-center font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+        >
+          <i class="fas fa-globe mr-1"></i>
+          <span>Language</span>
+        </button>
+      </div>
+      <div class="py-2">
+        <a
+          href="products.html"
+          class="font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+          data-i18n="PRODUCTS"
+          >Products</a
+        >
+      </div>
+      <div class="py-2">
+        <a
+          href="Certificates.html"
+          class=" font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+          data-i18n="CERTIFICATES"
+          >Certificates</a
+        >
+        <div class="py-2">
+          <a
+            href="contact.html"
+            class="font-bold bg-gradient-to-r from-[var(--feather-color)] via-[var(--olive-color)] to-[var(--black-color)] bg-clip-text text-transparent"
+            data-i18n="Contact Us"
+            >Contact Us</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
