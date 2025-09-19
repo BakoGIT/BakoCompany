@@ -54,53 +54,5 @@
     "description": "Premium oil for industrial machinery and equipment.",
     "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
     "color": "#2c3e50"
-  },
-  {
-    "id":8,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
-  },
-  {
-    "id": 9,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
-  },
-  {
-    "id": 10,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
-  },
-  {
-    "id": 11,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
-  },
-  {
-    "id": 12,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
-  },
-  {
-    "id": 13,
-    "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
-    "color": "#2c3e50"
   }
 ]
