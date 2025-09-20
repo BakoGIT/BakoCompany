@@ -51,48 +51,48 @@
     "id": 7,
     "name": "Engine Oil",
     "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
+    "description": "Premium oil for industrial machinery operating under moderate conditions.",
     "image": "Assets/Products/Bako-Product-Blue-1L-15-40.jpg",
     "color": "#2c3e50"
   },
   {
-    "id":8,
+    "id": 8,
     "name": "Engine Oil",
     "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/5W-30.jpg",
+    "description": "Enhanced performance oil for heavy-duty industrial machines.",
+    "image": "Assets/Products/Bako-Product-Blue-4L-15-40.jpg", 
     "color": "#2c3e50"
   },
   {
     "id": 9,
     "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
+    "viscosity": "0W-20",
+    "description": "Low viscosity oil for modern engines requiring high fuel efficiency.",
     "image": "Assets/Products/0W-20.jpg",
     "color": "#2c3e50"
   },
   {
     "id": 10,
     "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
+    "viscosity": "5W-40",
+    "description": "Versatile oil suitable for a wide range of industrial and automotive engines.",
     "image": "Assets/Products/5W-40.jpg",
     "color": "#2c3e50"
   },
   {
     "id": 11,
     "name": "Engine Oil",
-    "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/15W-40.jpg",
+    "viscosity": "10W-40",
+    "description": "High-performance oil for industrial machinery with enhanced wear protection.",
+    "image": "Assets/Products/10W-40.jpg",
     "color": "#2c3e50"
   },
   {
     "id": 12,
     "name": "Engine Oil",
     "viscosity": "15W-40",
-    "description": "Premium oil for industrial machinery and equipment.",
-    "image": "Assets/Products/10W-40.jpg",
+    "description": "Heavy-duty oil for machinery working under high pressure and temperature.",
+    "image": "Assets/Products/15W-40.jpg",
     "color": "#2c3e50"
-  },
+  }
 ]
