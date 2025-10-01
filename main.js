@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             
-            // ❌ تم حذف السطر الخاطئ: window.addEventListener('load', handleProductUrlHash);
+       
 
             fetch("products.json")
                 .then((response) => response.json())
@@ -305,4 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
             loadHTML("#header-placeholder", "layout/header.html", initializeApp);
         })
         .catch((e) => console.error("Could not load translations:", e));
+
 });
+
