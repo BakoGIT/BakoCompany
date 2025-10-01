@@ -1,17 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // ... (Your loadHTML function and initial fetches remain the same) ...
-
+    // ... (loadHTML function, footer/about loading, translation setup, and setLang function are correct) ...
     const loadHTML = (selector, url, callback) => {
         fetch(url)
             .then(response => response.text())
             .then(data => {
-                document.querySelector(selector).innerHTML = data;
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.innerHTML = data;
+                } else {
+                    console.error(`Element with selector ${selector} not found.`);
+                }
                 if (callback) {
                     callback();
                 }
             })
             .catch(error => console.error(`Error loading ${url}:`, error));
     };
+    
+    // ... (rest of initial fetches and translation setup) ...
 
     loadHTML("#footer-placeholder", "layout/footer.html");
 
@@ -49,7 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function initializeApp() {
-        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER / MODAL LOGIC remain the same ---
+        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER / MODAL LOGIC (Correct) ---
+        // ... (All existing logic for menu, scrolling, observer, and modals remains here) ...
         const mobileMenuButton = document.getElementById("mobile-menu-button");
         const mobileMenu = document.getElementById("mobile-menu");
         if (mobileMenuButton && mobileMenu) {
@@ -66,8 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-
-        // --- SMOOTH SCROLLING ---
         document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
             anchor.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -78,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // --- INTERSECTION OBSERVER FOR ANIMATIONS ---
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -92,14 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".product-card").forEach((card) => {
             observer.observe(card);
         });
-
-        // --- MODAL LOGIC ---
+        
         const langModal = document.getElementById("lang-modal");
         const termsModal = document.getElementById("terms-modal");
         const noticeModal = document.getElementById("notice-modal");
         const aboutModal = document.getElementById("about-modal");
 
         function openModal(modal) {
+            // ... (openModal logic) ...
             if (modal) {
                 modal.classList.remove("hidden");
                 const modalContent = modal.querySelector(".bg-white");
@@ -114,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function closeModal(modal) {
+            // ... (closeModal logic) ...
             if (modal) {
                 const modalContent = modal.querySelector(".bg-white");
                 if (modalContent) {
@@ -126,25 +131,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             }
         }
-        
-        // ... (Modal event listeners remain the same) ...
-
+        // ... (Modal event listeners are correct) ...
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
-        document.getElementById("terms-link")?.addEventListener("click", (e) => {
-            e.preventDefault();
-            openModal(termsModal);
-        });
-        document.getElementById("notice-link")?.addEventListener("click", (e) => {
-            e.preventDefault();
-            openModal(noticeModal);
-        });
-        document.getElementById("footer-about-link")?.addEventListener("click", (e) => {
-            e.preventDefault();
-            openModal(aboutModal);
-        });
-
-        // Event Listeners to CLOSE modals
+        document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
+        document.getElementById("notice-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(noticeModal); });
+        document.getElementById("footer-about-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(aboutModal); });
         document.getElementById("close-lang-modal")?.addEventListener("click", () => closeModal(langModal));
         document.getElementById("close-terms-modal")?.addEventListener("click", () => closeModal(termsModal));
         document.getElementById("close-notice-modal")?.addEventListener("click", () => closeModal(noticeModal));
@@ -152,15 +144,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("close-terms-modal-button")?.addEventListener("click", () => closeModal(termsModal));
         document.getElementById("close-notice-modal-button")?.addEventListener("click", () => closeModal(noticeModal));
         document.getElementById("close-about-modal-button")?.addEventListener("click", () => closeModal(aboutModal));
-
         window.addEventListener("click", (e) => {
             if (e.target === langModal) closeModal(langModal);
             if (e.target === termsModal) closeModal(termsModal);
             if (e.target === noticeModal) closeModal(noticeModal);
             if (e.target === aboutModal) closeModal(aboutModal);
         });
-
-        // Handle language selection from modal
         document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 const lang = btn.getAttribute("data-lang");
@@ -169,7 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // --- CONTACT FORM LOGIC ---
+
+        // --- CONTACT FORM LOGIC (Correct) ---
         const contactForm = document.getElementById("contact-form");
         if (contactForm) {
             contactForm.addEventListener("submit", function (event) {
@@ -177,23 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const message = document.getElementById("message").value;
                 const toEmail = "Abd.bako.company@gmail.com";
                 const subject = "Message from Website Contact Form";
-                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(
-                    subject
-                )}&body=${encodeURIComponent(message)}`;
+                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
                 window.location.href = mailtoLink;
             });
         }
 
         // --- PRODUCTS PAGE LOGIC ---
-        const productGrid = document.querySelector("#product-grid"); // Use a specific ID
+        const productGrid = document.querySelector("#product-grid");
         if (productGrid) {
-            // تحديد متغير لتخزين بيانات المنتجات لجعله متاحاً خارج نطاق الـ fetch
-            let allProducts = []; 
+            let allProducts = [];
             
-            // تعريف الدالة التي تفتح النافذة المنبثقة وتملأ بياناتها
             function showProductDetails(product, modal) {
-                if (!product || !modal) return; // تأكد من وجود المنتج والنافذة المنبثقة
-
+                if (!product || !modal) return;
+                // ... (modal content filling logic is correct) ...
                 const modalContent = modal.querySelector(".modal-content");
                 const modalImage = document.getElementById("modal-image");
                 const modalName = document.getElementById("modal-name");
@@ -206,16 +192,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalImage.src = product.image;
                 modalName.textContent = product.name;
                 modalViscosity.textContent = product.viscosity;
-                
-                // **ملاحظة:** قد تحتاج إلى ترجمة الوصف هنا إذا كنت تستخدم نظام الترجمة
                 modalDescription.textContent = product.description; 
 
                 modal.classList.remove("hidden", "opacity-0");
                 modal.classList.add("flex");
             }
 
-            // تعريف دالة إغلاق النافذة المنبثقة بشكل منفصل (لإعادة الاستخدام)
             const closeModal = (modal) => {
+                // ... (closeModal logic is correct) ...
                 if (!modal) return;
                 modal.classList.add("opacity-0");
                 setTimeout(() => {
@@ -224,30 +208,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             };
 
-            // **تعريف دالة معالجة الرابط (الهاش) - تمت إعادتها**
+            // **تعريف دالة معالجة الهاش (Correct)**
             function handleProductHash(productsData, modal) {
-                const hash = window.location.hash.substring(1); 
+                const hash = window.location.hash.substring(1);
                 if (hash) {
                     const productIDFromURL = hash;
-                    // تأكد أن المنتجات محملة قبل البحث
                     const targetProduct = productsData.find(p => p.id == productIDFromURL);
                     
                     if (targetProduct) {
                         showProductDetails(targetProduct, modal);
-                        // اختياري: إزالة الهاش من الرابط لجعله يبدو أنظف بعد الفتح
                         // history.replaceState(null, null, ' '); 
                     }
                 }
             }
-            
-       
 
             fetch("products.json")
                 .then((response) => response.json())
                 .then((products) => {
-                    allProducts = products; // تخزين المنتجات في المتغير الخارجي
-                    productGrid.innerHTML = ""; // Clear existing content
+                    allProducts = products;
+                    productGrid.innerHTML = "";
 
+                    // ... (product card generation loop is correct) ...
                     products.forEach((product) => {
                         const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
                         productGrid.innerHTML += `
@@ -266,11 +247,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                     });
 
-                    // تهيئة عناصر النافذة المنبثقة
                     const modal = document.getElementById("product-modal");
                     const closeModalButton = document.getElementById("close-modal");
                     
-                    // ربط زر عرض التفاصيل (View Details) بالدالة الجديدة
+                    // ... (event listeners for buttons/modal are correct) ...
                     document.querySelectorAll(".view-details-btn").forEach((button) => {
                         button.addEventListener("click", (e) => {
                             e.stopPropagation();
@@ -280,7 +260,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                     });
 
-                    // ربط أزرار الإغلاق بالدالة الجديدة
                     closeModalButton.addEventListener("click", () => closeModal(modal));
                     modal.addEventListener("click", (e) => {
                         if (e.target === modal) {
@@ -288,23 +267,20 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     });
 
-                    // **تنفيذ الخطوة الحاسمة:** فحص الرابط مباشرة بعد تحميل المنتجات
+                    // **Execution Point (Correct)**
                     handleProductHash(products, modal); 
-
                 })
                 .catch((e) => console.error("Could not load products:", e));
         }
     }
 
-    // Fetch translations, then initialize the app
+    // Fetch translations, then initialize the app (Correct)
     fetch("translation.json")
         .then((res) => res.json())
         .then((data) => {
             Object.assign(translations, data);
-            setLang(currentLang); // Translate the page first
+            setLang(currentLang);
             loadHTML("#header-placeholder", "layout/header.html", initializeApp);
         })
         .catch((e) => console.error("Could not load translations:", e));
-
 });
-
