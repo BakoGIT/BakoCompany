@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // ... (loadHTML function, footer/about loading, translation setup, and setLang function are correct) ...
+    // -----------------------------------------------------------
+    // 1. HELPER FUNCTIONS AND INITIAL SETUP
+    // -----------------------------------------------------------
+
     const loadHTML = (selector, url, callback) => {
         fetch(url)
             .then(response => response.text())
@@ -17,8 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(error => console.error(`Error loading ${url}:`, error));
     };
     
-    // ... (rest of initial fetches and translation setup) ...
-
+    // Load common parts
     loadHTML("#footer-placeholder", "layout/footer.html");
 
     // Load about.html into the modal placeholder
@@ -54,9 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
         window.dispatchEvent(event);
     }
 
+    // -----------------------------------------------------------
+    // 2. MAIN APPLICATION INITIALIZATION
+    // -----------------------------------------------------------
+
     function initializeApp() {
-        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER / MODAL LOGIC (Correct) ---
-        // ... (All existing logic for menu, scrolling, observer, and modals remains here) ...
+        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER ---
         const mobileMenuButton = document.getElementById("mobile-menu-button");
         const mobileMenu = document.getElementById("mobile-menu");
         if (mobileMenuButton && mobileMenu) {
@@ -93,17 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             { threshold: 0.1 }
         );
-        document.querySelectorAll(".product-card").forEach((card) => {
-            observer.observe(card);
-        });
+        // Note: IntersectionObserver is only applied to currently existing elements.
+        // Product cards will be observed later after they are generated.
         
+        // --- GENERAL MODAL LOGIC ---
         const langModal = document.getElementById("lang-modal");
         const termsModal = document.getElementById("terms-modal");
         const noticeModal = document.getElementById("notice-modal");
         const aboutModal = document.getElementById("about-modal");
 
         function openModal(modal) {
-            // ... (openModal logic) ...
             if (modal) {
                 modal.classList.remove("hidden");
                 const modalContent = modal.querySelector(".bg-white");
@@ -118,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function closeModal(modal) {
-            // ... (closeModal logic) ...
             if (modal) {
                 const modalContent = modal.querySelector(".bg-white");
                 if (modalContent) {
@@ -131,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             }
         }
-        // ... (Modal event listeners are correct) ...
+        
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
@@ -158,8 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-
-        // --- CONTACT FORM LOGIC (Correct) ---
+        // --- CONTACT FORM LOGIC ---
         const contactForm = document.getElementById("contact-form");
         if (contactForm) {
             contactForm.addEventListener("submit", function (event) {
@@ -171,15 +173,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = mailtoLink;
             });
         }
+        
+        // -----------------------------------------------------------
+        // 3. PRODUCTS PAGE LOGIC (Including URL Hash Fix)
+        // -----------------------------------------------------------
+        
+        // Define allProducts in this scope for access by the hashchange listener
+        let allProducts = [];
 
-        // --- PRODUCTS PAGE LOGIC ---
         const productGrid = document.querySelector("#product-grid");
         if (productGrid) {
-            let allProducts = [];
             
+            // Product Modal Specific Functions
             function showProductDetails(product, modal) {
                 if (!product || !modal) return;
-                // ... (modal content filling logic is correct) ...
                 const modalContent = modal.querySelector(".modal-content");
                 const modalImage = document.getElementById("modal-image");
                 const modalName = document.getElementById("modal-name");
@@ -198,8 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 modal.classList.add("flex");
             }
 
-            const closeModal = (modal) => {
-                // ... (closeModal logic is correct) ...
+            const closeModalProduct = (modal) => {
                 if (!modal) return;
                 modal.classList.add("opacity-0");
                 setTimeout(() => {
@@ -208,27 +214,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             };
 
-            // **تعريف دالة معالجة الهاش (Correct)**
+            // Function to handle the URL hash (e.g., #3)
             function handleProductHash(productsData, modal) {
                 const hash = window.location.hash.substring(1);
                 if (hash) {
                     const productIDFromURL = hash;
+                    // Note: '==' is used for flexible comparison (number 3 vs string "3")
                     const targetProduct = productsData.find(p => p.id == productIDFromURL);
                     
                     if (targetProduct) {
                         showProductDetails(targetProduct, modal);
-                        // history.replaceState(null, null, ' '); 
                     }
                 }
             }
-
+            
             fetch("products.json")
                 .then((response) => response.json())
                 .then((products) => {
-                    allProducts = products;
+                    allProducts = products; // Store data in outer variable
                     productGrid.innerHTML = "";
 
-                    // ... (product card generation loop is correct) ...
                     products.forEach((product) => {
                         const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
                         productGrid.innerHTML += `
@@ -250,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const modal = document.getElementById("product-modal");
                     const closeModalButton = document.getElementById("close-modal");
                     
-                    // ... (event listeners for buttons/modal are correct) ...
                     document.querySelectorAll(".view-details-btn").forEach((button) => {
                         button.addEventListener("click", (e) => {
                             e.stopPropagation();
@@ -260,21 +264,42 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                     });
 
-                    closeModalButton.addEventListener("click", () => closeModal(modal));
+                    closeModalButton.addEventListener("click", () => closeModalProduct(modal));
                     modal.addEventListener("click", (e) => {
                         if (e.target === modal) {
-                            closeModal(modal);
+                            closeModalProduct(modal);
                         }
                     });
 
-                    // **Execution Point (Correct)**
+                    // Execute hash check immediately after product data is ready
                     handleProductHash(products, modal); 
+                    
+                    // Apply Intersection Observer to newly created cards
+                    document.querySelectorAll(".product-card").forEach((card) => {
+                        observer.observe(card);
+                    });
+
                 })
                 .catch((e) => console.error("Could not load products:", e));
         }
-    }
+        
+        // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
+        window.addEventListener("hashchange", () => {
+            const productGrid = document.querySelector("#product-grid");
+            // Only run if we are on the products page and data is loaded
+            if (productGrid && allProducts.length > 0) {
+                const modal = document.getElementById("product-modal");
+                handleProductHash(allProducts, modal);
+            }
+        });
 
-    // Fetch translations, then initialize the app (Correct)
+    } // End of initializeApp
+
+    // -----------------------------------------------------------
+    // 4. STARTUP SEQUENCE
+    // -----------------------------------------------------------
+
+    // Fetch translations, then load the header and start the app
     fetch("translation.json")
         .then((res) => res.json())
         .then((data) => {
