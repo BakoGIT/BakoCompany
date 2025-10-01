@@ -202,77 +202,114 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- PRODUCTS PAGE LOGIC ---
-    const productGrid = document.querySelector("#product-grid"); // Use a specific ID
-    if (productGrid) {
-      fetch("products.json")
+const productGrid = document.querySelector("#product-grid"); // Use a specific ID
+if (productGrid) {
+    // تحديد متغير لتخزين بيانات المنتجات لجعله متاحاً خارج نطاق الـ fetch
+    let allProducts = []; 
+    
+    // تعريف الدالة التي تفتح النافذة المنبثقة وتملأ بياناتها
+    function showProductDetails(product, modal) {
+        if (!product || !modal) return; // تأكد من وجود المنتج والنافذة المنبثقة
+
+        const modalContent = modal.querySelector(".modal-content");
+        const modalImage = document.getElementById("modal-image");
+        const modalName = document.getElementById("modal-name");
+        const modalViscosity = document.getElementById("modal-viscosity");
+        const modalDescription = document.getElementById("modal-description");
+        
+        const gradient = `linear-gradient(135deg, ${product.color} 0%, #1a202c 100%)`;
+        modalContent.style.background = gradient;
+
+        modalImage.src = product.image;
+        modalName.textContent = product.name;
+        modalViscosity.textContent = product.viscosity;
+        
+        // **ملاحظة:** قد تحتاج إلى ترجمة الوصف هنا إذا كنت تستخدم نظام الترجمة
+        modalDescription.textContent = product.description; 
+
+        modal.classList.remove("hidden", "opacity-0");
+        modal.classList.add("flex");
+    }
+
+    // تعريف دالة إغلاق النافذة المنبثقة بشكل منفصل (لإعادة الاستخدام)
+    const closeModal = (modal) => {
+        if (!modal) return;
+        modal.classList.add("opacity-0");
+        setTimeout(() => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }, 300);
+    };
+
+    // تعريف دالة معالجة الرابط (الهاش)
+    function handleProductHash(productsData, modal) {
+        const hash = window.location.hash.substring(1); 
+        if (hash) {
+            const productIDFromURL = hash;
+            const targetProduct = productsData.find(p => p.id === productIDFromURL);
+            
+            if (targetProduct) {
+                // استدعاء الدالة الجديدة لفتح النافذة المنبثقة
+                showProductDetails(targetProduct, modal);
+                // اختياري: إزالة الهاش من الرابط لجعله يبدو أنظف بعد الفتح
+                // history.replaceState(null, null, ' '); 
+            }
+        }
+    }
+
+
+    fetch("products.json")
         .then((response) => response.json())
         .then((products) => {
-          productGrid.innerHTML = ""; // Clear existing content
+            allProducts = products; // تخزين المنتجات في المتغير الخارجي
+            productGrid.innerHTML = ""; // Clear existing content
 
-          products.forEach((product) => {
-            const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
-            productGrid.innerHTML += `
-              <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
-                  <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
-                      <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                  </div>
-                  <div class="p-6 text-center">
-                      <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
-                      <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
-                      <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
-                          View Details
-                      </button>
-                  </div>
-              </div>
-            `;
-          });
-
-          // Modal Logic
-          const modal = document.getElementById("product-modal");
-          const modalContent = modal.querySelector(".modal-content");
-          const modalImage = document.getElementById("modal-image");
-          const modalName = document.getElementById("modal-name");
-          const modalViscosity = document.getElementById("modal-viscosity");
-          const modalDescription = document.getElementById("modal-description");
-          const closeModalButton = document.getElementById("close-modal");
-
-          document.querySelectorAll(".view-details-btn").forEach((button) => {
-            button.addEventListener("click", (e) => {
-              e.stopPropagation();
-              const productId = button.getAttribute("data-product-id");
-              const product = products.find((p) => p.id == productId);
-
-              const gradient = `linear-gradient(135deg, ${product.color} 0%, #1a202c 100%)`;
-              modalContent.style.background = gradient;
-
-              modalImage.src = product.image;
-              modalName.textContent = product.name;
-              modalViscosity.textContent = product.viscosity;
-              modalDescription.textContent = product.description;
-
-              modal.classList.remove("hidden", "opacity-0");
-              modal.classList.add("flex");
+            products.forEach((product) => {
+                const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
+                productGrid.innerHTML += `
+                    <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
+                        <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 text-center">
+                            <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
+                            <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
+                            <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
             });
-          });
 
-          const closeModal = () => {
-            modal.classList.add("opacity-0");
-            setTimeout(() => {
-              modal.classList.add("hidden");
-              modal.classList.remove("flex");
-            }, 300);
-          };
+            // تهيئة عناصر النافذة المنبثقة
+            const modal = document.getElementById("product-modal");
+            const closeModalButton = document.getElementById("close-modal");
+            
+            // ربط زر عرض التفاصيل (View Details) بالدالة الجديدة
+            document.querySelectorAll(".view-details-btn").forEach((button) => {
+                button.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const productId = button.getAttribute("data-product-id");
+                    const product = products.find((p) => p.id == productId);
+                    showProductDetails(product, modal);
+                });
+            });
 
-          closeModalButton.addEventListener("click", closeModal);
-          modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-              closeModal();
-            }
-          });
+            // ربط أزرار الإغلاق بالدالة الجديدة
+            closeModalButton.addEventListener("click", () => closeModal(modal));
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+
+            // **تنفيذ الخطوة الحاسمة:** فحص الرابط مباشرة بعد تحميل المنتجات
+            handleProductHash(products, modal); 
+
         })
         .catch((e) => console.error("Could not load products:", e));
-    }
-  }
+}
 
   // Fetch translations, then initialize the app
   fetch("translation.json")
@@ -284,3 +321,35 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch((e) => console.error("Could not load translations:", e));
 });
+
+// **وظيفة جديدة**: معالجة تجزئة الرابط عند تحميل الصفحة
+function handleProductUrlHash() {
+    // الحصول على الجزء الهاش من الرابط وإزالة علامة '#'
+    const hash = window.location.hash.substring(1); 
+
+    // التأكد من وجود ID منتج في الرابط
+    if (hash) {
+        // بما أن الهاش هو المنتج ID، قم بالبحث عن المنتج في قائمة المنتجات
+        // **ملاحظة:** ستحتاج إلى تعديل هذا الجزء ليتناسب مع كيفية تخزينك لقائمة المنتجات (مثل Array.find() إذا كانت مصفوفة).
+        
+        // **مثال على البحث (افترض أن لديك مصفوفة تسمى 'allProducts')**:
+        const productIDFromURL = hash;
+        const targetProduct = Products.find(p => p.id === productIDFromURL);
+        
+        if (targetProduct) {
+            // **استدعِ الدالة التي تفتح النافذة المنبثقة:**
+            // يجب عليك استبدال 'openProductModal' بالاسم الحقيقي للدالة التي تستخدمها حالياً
+            // لفتح البوب-اب وتعبئته بالبيانات.
+            openProductModal(targetProduct);
+            
+            // اختياري: إزالة الهاش من الرابط لجعله يبدو أنظف بعد الفتح
+            // history.replaceState(null, null, ' '); 
+        }
+    }
+}
+
+// استدعاء الوظيفة عند تحميل الصفحة للتأكد من فحص الرابط فوراً
+window.addEventListener('load', handleProductUrlHash);
+
+// يمكنك أيضاً استدعاؤها مباشرة في نهاية الملف للتطبيقات البسيطة:
+// handleProductUrlHash();
