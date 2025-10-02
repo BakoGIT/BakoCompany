@@ -1,11 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // ... (Your loadHTML function and initial fetches remain the same) ...
-
+    // Helper function to load HTML content
     const loadHTML = (selector, url, callback) => {
         fetch(url)
             .then(response => response.text())
             .then(data => {
-                document.querySelector(selector).innerHTML = data;
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.innerHTML = data;
+                }
                 if (callback) {
                     callback();
                 }
@@ -13,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(error => console.error(`Error loading ${url}:`, error));
     };
 
+    // Initial HTML loads (Footer and About Modal content)
     loadHTML("#footer-placeholder", "layout/footer.html");
 
     // Load about.html into the modal placeholder
@@ -34,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("lang", lang);
         document.querySelectorAll("[data-i18n]").forEach((el) => {
             const key = el.getAttribute("data-i18n");
+            // Use the language-specific translation if available, otherwise fall back to the key's original text (if needed)
             if (translations[lang] && translations[lang][key]) {
                 el.innerText = translations[lang][key];
             }
@@ -127,8 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
-        // ... (Modal event listeners remain the same) ...
-
+        // --- Modal event listeners (Opening) ---
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("terms-link")?.addEventListener("click", (e) => {
@@ -144,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
             openModal(aboutModal);
         });
 
-        // Event Listeners to CLOSE modals
+        // --- Modal event listeners (Closing) ---
         document.getElementById("close-lang-modal")?.addEventListener("click", () => closeModal(langModal));
         document.getElementById("close-terms-modal")?.addEventListener("click", () => closeModal(termsModal));
         document.getElementById("close-notice-modal")?.addEventListener("click", () => closeModal(noticeModal));
@@ -186,139 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // --- PRODUCTS PAGE LOGIC ---
         const productGrid = document.querySelector("#product-grid"); // Use a specific ID
-        if (productGrid) {
-            // تحديد متغير لتخزين بيانات المنتجات لجعله متاحاً خارج نطاق الـ fetch
-            let allProducts = []; 
-            
-            // تعريف الدالة التي تفتح النافذة المنبثقة وتملأ بياناتها
-            function showProductDetails(product, modal) {
-                if (!product || !modal) return; // تأكد من وجود المنتج والنافذة المنبثقة
-
-                const modalContent = modal.querySelector(".modal-content");
-                const modalImage = document.getElementById("modal-image");
-                const modalName = document.getElementById("modal-name");
-                const modalViscosity = document.getElementById("modal-viscosity");
-                const modalDescription = document.getElementById("modal-description");
-                
-                const gradient = `linear-gradient(135deg, ${product.color} 0%, #1a202c 100%)`;
-                modalContent.style.background = gradient;
-
-                modalImage.src = product.image;
-                modalName.textContent = product.name;
-                modalViscosity.textContent = product.viscosity;
-                
-                // **ملاحظة:** قد تحتاج إلى ترجمة الوصف هنا إذا كنت تستخدم نظام الترجمة
-                modalDescription.textContent = product.description; 
-
-                modal.classList.remove("hidden", "opacity-0");
-                modal.classList.add("flex");
-            }
-
-            // تعريف دالة إغلاق النافذة المنبثقة بشكل منفصل (لإعادة الاستخدام)
-            const closeModal = (modal) => {
-                if (!modal) return;
-                modal.classList.add("opacity-0");
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                    modal.classList.remove("flex");
-                }, 300);
-            };
-
-            // **تعريف دالة معالجة الرابط (الهاش) - تمت إعادتها**
-            function handleProductHash(productsData, modal) {
-                const hash = window.location.hash.substring(1); 
-                if (hash) {
-                    const productIDFromURL = hash;
-                    // تأكد أن المنتجات محملة قبل البحث
-                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
-                    
-                    if (targetProduct) {
-                        showProductDetails(targetProduct, modal);
-                        // اختياري: إزالة الهاش من الرابط لجعله يبدو أنظف بعد الفتح
-                        // history.replaceState(null, null, ' '); 
-                    }
-                }
-            }
-            
-            // ❌ تم حذف السطر الخاطئ: window.addEventListener('load', handleProductUrlHash);
-
-            fetch("products.json")
-                .then((response) => response.json())
-                .then((products) => {
-                    allProducts = products; // تخزين المنتجات في المتغير الخارجي
-                    productGrid.innerHTML = ""; // Clear existing content
-
-                    products.forEach((product) => {
-                        const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
-                        productGrid.innerHTML += `
-                            <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
-                                <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
-                                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-6 text-center">
-                                    <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
-                                    <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
-                                    <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
-                                        View Details
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    // تهيئة عناصر النافذة المنبثقة
-                    const modal = document.getElementById("product-modal");
-                    const closeModalButton = document.getElementById("close-modal");
-                    
-                    // ربط زر عرض التفاصيل (View Details) بالدالة الجديدة
-                    document.querySelectorAll(".view-details-btn").forEach((button) => {
-                        button.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            const productId = button.getAttribute("data-product-id");
-                            const product = products.find((p) => p.id == productId);
-                            showProductDetails(product, modal);
-                        });
-                    });
-
-                    // ربط أزرار الإغلاق بالدالة الجديدة
-                    closeModalButton.addEventListener("click", () => closeModal(modal));
-                    modal.addEventListener("click", (e) => {
-                        if (e.target === modal) {
-                            closeModal(modal);
-                        }
-                    });
-
-                    // **تنفيذ الخطوة الحاسمة:** فحص الرابط مباشرة بعد تحميل المنتجات
-                    handleProductHash(products, modal); 
-
-                })
-                .catch((e) => console.error("Could not load products:", e));
-        }
-    }
-
-    // Fetch translations, then initialize the app
-    fetch("translation.json")
-        .then((res) => res.json())
-        .then((data) => {
-            Object.assign(translations, data);
-            setLang(currentLang); // Translate the page first
-            loadHTML("#header-placeholder", "layout/header.html", initializeApp);
-        })
-        .catch((e) => console.error("Could not load translations:", e));
-});
-    } // End of initializeApp
-
-    // -----------------------------------------------------------
-    // 4. STARTUP SEQUENCE
-    // -----------------------------------------------------------
-
-    // Fetch translations, then load the header and start the app
-    fetch("translation.json")
-        .then((res) => res.json())
-        .then((data) => {
-            Object.assign(translations, data);
-            setLang(currentLang);
-            loadHTML("#header-placeholder", "layout/header.html", initializeApp);
-        })
-        .catch((e) => console.error("Could not load translations:", e));
-});
+        const productDetailModal = document.getElementById("product-modal"); // Define the product modal here
+        
+        if (productGrid && productDetailModal) {
