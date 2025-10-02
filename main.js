@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
              //       const targetProduct = productsData.find(p => p.id == productIDFromURL);
                     
              //       if (targetProduct) {
-                        showProductDetails(targetProduct, modal);
+                    //    showProductDetails(targetProduct, modal);
             //        }
            //     }
          //   }
