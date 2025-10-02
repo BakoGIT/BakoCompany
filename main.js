@@ -1,26 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // -----------------------------------------------------------
-    // 1. HELPER FUNCTIONS AND INITIAL SETUP
-    // -----------------------------------------------------------
+    // ... (Your loadHTML function and initial fetches remain the same) ...
 
     const loadHTML = (selector, url, callback) => {
         fetch(url)
             .then(response => response.text())
             .then(data => {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.innerHTML = data;
-                } else {
-                    console.error(`Element with selector ${selector} not found.`);
-                }
+                document.querySelector(selector).innerHTML = data;
                 if (callback) {
                     callback();
                 }
             })
             .catch(error => console.error(`Error loading ${url}:`, error));
     };
-    
-    // Load common parts
+
     loadHTML("#footer-placeholder", "layout/footer.html");
 
     // Load about.html into the modal placeholder
@@ -56,12 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
         window.dispatchEvent(event);
     }
 
-    // -----------------------------------------------------------
-    // 2. MAIN APPLICATION INITIALIZATION
-    // -----------------------------------------------------------
-
     function initializeApp() {
-        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER ---
+        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER / MODAL LOGIC remain the same ---
         const mobileMenuButton = document.getElementById("mobile-menu-button");
         const mobileMenu = document.getElementById("mobile-menu");
         if (mobileMenuButton && mobileMenu) {
@@ -78,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
+
+        // --- SMOOTH SCROLLING ---
         document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
             anchor.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -88,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        // --- INTERSECTION OBSERVER FOR ANIMATIONS ---
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -98,10 +89,11 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             { threshold: 0.1 }
         );
-        // Note: IntersectionObserver is only applied to currently existing elements.
-        // Product cards will be observed later after they are generated.
-        
-        // --- GENERAL MODAL LOGIC ---
+        document.querySelectorAll(".product-card").forEach((card) => {
+            observer.observe(card);
+        });
+
+        // --- MODAL LOGIC ---
         const langModal = document.getElementById("lang-modal");
         const termsModal = document.getElementById("terms-modal");
         const noticeModal = document.getElementById("notice-modal");
@@ -135,11 +127,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
+        // ... (Modal event listeners remain the same) ...
+
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
-        document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
-        document.getElementById("notice-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(noticeModal); });
-        document.getElementById("footer-about-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(aboutModal); });
+        document.getElementById("terms-link")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            openModal(termsModal);
+        });
+        document.getElementById("notice-link")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            openModal(noticeModal);
+        });
+        document.getElementById("footer-about-link")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            openModal(aboutModal);
+        });
+
+        // Event Listeners to CLOSE modals
         document.getElementById("close-lang-modal")?.addEventListener("click", () => closeModal(langModal));
         document.getElementById("close-terms-modal")?.addEventListener("click", () => closeModal(termsModal));
         document.getElementById("close-notice-modal")?.addEventListener("click", () => closeModal(noticeModal));
@@ -147,12 +152,15 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("close-terms-modal-button")?.addEventListener("click", () => closeModal(termsModal));
         document.getElementById("close-notice-modal-button")?.addEventListener("click", () => closeModal(noticeModal));
         document.getElementById("close-about-modal-button")?.addEventListener("click", () => closeModal(aboutModal));
+
         window.addEventListener("click", (e) => {
             if (e.target === langModal) closeModal(langModal);
             if (e.target === termsModal) closeModal(termsModal);
             if (e.target === noticeModal) closeModal(noticeModal);
             if (e.target === aboutModal) closeModal(aboutModal);
         });
+
+        // Handle language selection from modal
         document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 const lang = btn.getAttribute("data-lang");
@@ -169,24 +177,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const message = document.getElementById("message").value;
                 const toEmail = "Abd.bako.company@gmail.com";
                 const subject = "Message from Website Contact Form";
-                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(
+                    subject
+                )}&body=${encodeURIComponent(message)}`;
                 window.location.href = mailtoLink;
             });
         }
-        
-        // -----------------------------------------------------------
-        // 3. PRODUCTS PAGE LOGIC (Including URL Hash Fix)
-        // -----------------------------------------------------------
-        
-        // Define allProducts in this scope for access by the hashchange listener
-        let allProducts = [];
 
-        const productGrid = document.querySelector("#product-grid");
+        // --- PRODUCTS PAGE LOGIC ---
+        const productGrid = document.querySelector("#product-grid"); // Use a specific ID
         if (productGrid) {
+            // تحديد متغير لتخزين بيانات المنتجات لجعله متاحاً خارج نطاق الـ fetch
+            let allProducts = []; 
             
-            // Product Modal Specific Functions
+            // تعريف الدالة التي تفتح النافذة المنبثقة وتملأ بياناتها
             function showProductDetails(product, modal) {
-                if (!product || !modal) return;
+                if (!product || !modal) return; // تأكد من وجود المنتج والنافذة المنبثقة
+
                 const modalContent = modal.querySelector(".modal-content");
                 const modalImage = document.getElementById("modal-image");
                 const modalName = document.getElementById("modal-name");
@@ -199,13 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalImage.src = product.image;
                 modalName.textContent = product.name;
                 modalViscosity.textContent = product.viscosity;
+                
+                // **ملاحظة:** قد تحتاج إلى ترجمة الوصف هنا إذا كنت تستخدم نظام الترجمة
                 modalDescription.textContent = product.description; 
 
                 modal.classList.remove("hidden", "opacity-0");
                 modal.classList.add("flex");
             }
 
-            const closeModalProduct = (modal) => {
+            // تعريف دالة إغلاق النافذة المنبثقة بشكل منفصل (لإعادة الاستخدام)
+            const closeModal = (modal) => {
                 if (!modal) return;
                 modal.classList.add("opacity-0");
                 setTimeout(() => {
@@ -214,25 +224,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             };
 
-            // Function to handle the URL hash (e.g., #3)
-         //   function handleProductHash(productsData, modal) {
-              //  const hash = window.location.hash.substring(1);
-            //    if (hash) {
-             //       const productIDFromURL = hash;
-            //        // Note: '==' is used for flexible comparison (number 3 vs string "3")
-             //       const targetProduct = productsData.find(p => p.id == productIDFromURL);
+            // **تعريف دالة معالجة الرابط (الهاش) - تمت إعادتها**
+            function handleProductHash(productsData, modal) {
+                const hash = window.location.hash.substring(1); 
+                if (hash) {
+                    const productIDFromURL = hash;
+                    // تأكد أن المنتجات محملة قبل البحث
+                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
                     
-             //       if (targetProduct) {
-                    //    showProductDetails(targetProduct, modal);
-            //        }
-           //     }
-         //   }
+                    if (targetProduct) {
+                        showProductDetails(targetProduct, modal);
+                        // اختياري: إزالة الهاش من الرابط لجعله يبدو أنظف بعد الفتح
+                        // history.replaceState(null, null, ' '); 
+                    }
+                }
+            }
             
+            // ❌ تم حذف السطر الخاطئ: window.addEventListener('load', handleProductUrlHash);
+
             fetch("products.json")
                 .then((response) => response.json())
                 .then((products) => {
-                    allProducts = products; // Store data in outer variable
-                    productGrid.innerHTML = "";
+                    allProducts = products; // تخزين المنتجات في المتغير الخارجي
+                    productGrid.innerHTML = ""; // Clear existing content
 
                     products.forEach((product) => {
                         const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
@@ -252,9 +266,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                     });
 
+                    // تهيئة عناصر النافذة المنبثقة
                     const modal = document.getElementById("product-modal");
                     const closeModalButton = document.getElementById("close-modal");
                     
+                    // ربط زر عرض التفاصيل (View Details) بالدالة الجديدة
                     document.querySelectorAll(".view-details-btn").forEach((button) => {
                         button.addEventListener("click", (e) => {
                             e.stopPropagation();
@@ -264,35 +280,32 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                     });
 
-                    closeModalButton.addEventListener("click", () => closeModalProduct(modal));
+                    // ربط أزرار الإغلاق بالدالة الجديدة
+                    closeModalButton.addEventListener("click", () => closeModal(modal));
                     modal.addEventListener("click", (e) => {
                         if (e.target === modal) {
-                            closeModalProduct(modal);
+                            closeModal(modal);
                         }
                     });
 
-                    // Execute hash check immediately after product data is ready
+                    // **تنفيذ الخطوة الحاسمة:** فحص الرابط مباشرة بعد تحميل المنتجات
                     handleProductHash(products, modal); 
-                    
-                    // Apply Intersection Observer to newly created cards
-                    document.querySelectorAll(".product-card").forEach((card) => {
-                        observer.observe(card);
-                    });
 
                 })
                 .catch((e) => console.error("Could not load products:", e));
         }
-        
-        // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
-        window.addEventListener("hashchange", () => {
-            const productGrid = document.querySelector("#product-grid");
-            // Only run if we are on the products page and data is loaded
-            if (productGrid && allProducts.length > 0) {
-                const modal = document.getElementById("product-modal");
-                handleProductHash(allProducts, modal);
-            }
-        });
+    }
 
+    // Fetch translations, then initialize the app
+    fetch("translation.json")
+        .then((res) => res.json())
+        .then((data) => {
+            Object.assign(translations, data);
+            setLang(currentLang); // Translate the page first
+            loadHTML("#header-placeholder", "layout/header.html", initializeApp);
+        })
+        .catch((e) => console.error("Could not load translations:", e));
+});
     } // End of initializeApp
 
     // -----------------------------------------------------------
