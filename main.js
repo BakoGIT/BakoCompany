@@ -98,10 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             { threshold: 0.1 }
         );
-        // Note: IntersectionObserver is only applied to currently existing elements.
-        // Product cards will be observed later after they are generated.
         
-        // --- GENERAL MODAL LOGIC ---
+        // --- GENERAL MODAL LOGIC (openModal / closeModal are now used for all) ---
         const langModal = document.getElementById("lang-modal");
         const termsModal = document.getElementById("terms-modal");
         const noticeModal = document.getElementById("notice-modal");
@@ -110,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function openModal(modal) {
             if (modal) {
                 modal.classList.remove("hidden");
-                const modalContent = modal.querySelector(".bg-white");
+                const modalContent = modal.querySelector(".bg-white, .modal-content-product"); // Added product modal content class
                 if (modalContent) {
                     modalContent.classList.remove("animate-scale-out");
                     modalContent.classList.add("animate-scale-in");
@@ -123,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function closeModal(modal) {
             if (modal) {
-                const modalContent = modal.querySelector(".bg-white");
+                const modalContent = modal.querySelector(".bg-white, .modal-content-product"); // Added product modal content class
                 if (modalContent) {
                     modalContent.classList.remove("animate-scale-in");
                     modalContent.classList.add("animate-scale-out");
@@ -152,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target === termsModal) closeModal(termsModal);
             if (e.target === noticeModal) closeModal(noticeModal);
             if (e.target === aboutModal) closeModal(aboutModal);
+            // Note: Product modal event is handled separately below.
         });
         document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
@@ -175,19 +174,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // -----------------------------------------------------------
-        // 3. PRODUCTS PAGE LOGIC (Including URL Hash Fix)
+        // 3. PRODUCTS PAGE LOGIC (Product Grid and Filter ONLY)
         // -----------------------------------------------------------
         
-        // Define allProducts in this scope for access by the hashchange listener
         let allProducts = [];
-
         const productGrid = document.querySelector("#product-grid");
+        const filtersContainer = document.getElementById("category-filters"); // Assuming you added this container
+
         if (productGrid) {
             
             // Product Modal Specific Functions
-            function showProductDetails(product, modal) {
+            function showProductDetails(product) { // Removed modal argument
+                const modal = document.getElementById("product-modal");
                 if (!product || !modal) return;
-                const modalContent = modal.querySelector(".modal-content");
+
+                // **NOTE:** You MUST update your product modal HTML to have class="modal-content-product" 
+                // on the inner div (the one with the background) for the general closeModal to work properly.
+                const modalContent = modal.querySelector(".modal-content"); 
                 const modalImage = document.getElementById("modal-image");
                 const modalName = document.getElementById("modal-name");
                 const modalViscosity = document.getElementById("modal-viscosity");
@@ -201,97 +204,124 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalViscosity.textContent = product.viscosity;
                 modalDescription.textContent = product.description; 
 
-                modal.classList.remove("hidden", "opacity-0");
-                modal.classList.add("flex");
+                openModal(modal); // Use general openModal
             }
 
-            const closeModalProduct = (modal) => {
-                if (!modal) return;
-                modal.classList.add("opacity-0");
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                    modal.classList.remove("flex");
-                }, 300);
-            };
+            // Function to generate filter buttons dynamically
+            function generateFilterButtons(productsData) {
+                if (!filtersContainer) return;
+                const categories = [...new Set(productsData.map(p => p.category).filter(c => c))];
+                
+                // Clear all filters except the 'all' button (which is static in HTML)
+                const allButtonHTML = filtersContainer.querySelector('[data-category="all"]').outerHTML;
+                filtersContainer.innerHTML = allButtonHTML;
 
-            // Function to handle the URL hash (e.g., #3)
-            function handleProductHash(productsData, modal) {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    const productIDFromURL = hash;
-                    // Note: '==' is used for flexible comparison (number 3 vs string "3")
-                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
-                    
-                    if (targetProduct) {
-                        showProductDetails(targetProduct, modal);
-                    }
+                categories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.textContent = category; 
+                    button.setAttribute('data-category', category);
+                    button.className = 'filter-btn bg-white text-gray-800 font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-200 transition duration-300';
+                    filtersContainer.appendChild(button);
+                });
+            }
+
+            // Function to apply filtering and re-render the grid
+            function filterProducts(category) {
+                // Update button active state
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('bg-gray-900', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-800');
+                });
+                
+                const currentButton = document.querySelector(`[data-category="${category}"]`);
+                if (currentButton) {
+                    currentButton.classList.remove('bg-white', 'text-gray-800', 'bg-gray-700');
+                    currentButton.classList.add('bg-gray-900', 'text-white');
                 }
+
+                productGrid.innerHTML = ""; // Clear the grid
+
+                const productsToDisplay = (category === 'all') 
+                    ? allProducts 
+                    : allProducts.filter(p => p.category === category);
+
+                // Rebuild and display filtered product cards
+                productsToDisplay.forEach((product) => {
+                    const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
+                    productGrid.innerHTML += `
+                        <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
+                            <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-6 text-center">
+                                <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
+                                <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
+                                <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // Reapply Intersection Observer and set language on new cards
+                document.querySelectorAll(".product-card").forEach((card) => {
+                     observer.observe(card);
+                });
+                setLang(currentLang);
+                
+                // Re-attach product detail listeners (since innerHTML overwrote them)
+                attachProductDetailListeners(productsToDisplay);
             }
             
+            // New function to attach listeners after grid re-render
+            function attachProductDetailListeners(products) {
+                document.querySelectorAll(".view-details-btn").forEach((button) => {
+                    button.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const productId = button.getAttribute("data-product-id");
+                        const product = products.find((p) => p.id == productId);
+                        showProductDetails(product);
+                    });
+                });
+            }
+
             fetch("products.json")
                 .then((response) => response.json())
                 .then((products) => {
-                    allProducts = products; // Store data in outer variable
-                    productGrid.innerHTML = "";
-
-                    products.forEach((product) => {
-                        const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
-                        productGrid.innerHTML += `
-                            <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
-                                <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
-                                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-6 text-center">
-                                    <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
-                                    <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
-                                    <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
-                                        View Details
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    const modal = document.getElementById("product-modal");
-                    const closeModalButton = document.getElementById("close-modal");
+                    allProducts = products; 
                     
-                    document.querySelectorAll(".view-details-btn").forEach((button) => {
-                        button.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            const productId = button.getAttribute("data-product-id");
-                            const product = products.find((p) => p.id == productId);
-                            showProductDetails(product, modal);
+                    // 1. Generate and attach filters
+                    generateFilterButtons(products);
+
+                    // 2. Attach filter event listeners
+                    document.querySelectorAll('.filter-btn').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const category = button.getAttribute('data-category');
+                            filterProducts(category);
                         });
                     });
 
-                    closeModalButton.addEventListener("click", () => closeModalProduct(modal));
+                    // 3. Display all products by default
+                    filterProducts('all');
+                    
+                    // 4. Attach modal closing logic for the product modal
+                    const modal = document.getElementById("product-modal");
+                    const closeModalButton = document.getElementById("close-modal");
+
+                    closeModalButton.addEventListener("click", () => closeModal(modal));
                     modal.addEventListener("click", (e) => {
                         if (e.target === modal) {
-                            closeModalProduct(modal);
+                            closeModal(modal);
                         }
                     });
 
-                    // Execute hash check immediately after product data is ready
-                    handleProductHash(products, modal); 
-                    
-                    // Apply Intersection Observer to newly created cards
-                    document.querySelectorAll(".product-card").forEach((card) => {
-                        observer.observe(card);
-                    });
-
+                    // We NO LONGER call handleProductHash here
                 })
                 .catch((e) => console.error("Could not load products:", e));
         }
         
-        // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
-        window.addEventListener("hashchange", () => {
-            const productGrid = document.querySelector("#product-grid");
-            // Only run if we are on the products page and data is loaded
-            if (productGrid && allProducts.length > 0) {
-                const modal = document.getElementById("product-modal");
-                handleProductHash(allProducts, modal);
-            }
-        });
+        // We NO LONGER attach window.addEventListener("hashchange", ...) here
 
     } // End of initializeApp
 
