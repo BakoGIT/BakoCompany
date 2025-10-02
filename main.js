@@ -215,18 +215,18 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             // Function to handle the URL hash (e.g., #3)
-            function handleProductHash(productsData, modal) {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    const productIDFromURL = hash;
-                    // Note: '==' is used for flexible comparison (number 3 vs string "3")
-                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
+         //   function handleProductHash(productsData, modal) {
+              //  const hash = window.location.hash.substring(1);
+            //    if (hash) {
+             //       const productIDFromURL = hash;
+            //        // Note: '==' is used for flexible comparison (number 3 vs string "3")
+             //       const targetProduct = productsData.find(p => p.id == productIDFromURL);
                     
-                    if (targetProduct) {
+             //       if (targetProduct) {
                         showProductDetails(targetProduct, modal);
-                    }
-                }
-            }
+            //        }
+           //     }
+         //   }
             
             fetch("products.json")
                 .then((response) => response.json())
