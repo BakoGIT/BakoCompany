@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (span) span.innerText = lang.toUpperCase();
         });
 
-        // Dispatch a custom event to notify other scripts of the language change
         const event = new CustomEvent("languageChange", { detail: { lang: lang } });
         window.dispatchEvent(event);
     }
@@ -99,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
             { threshold: 0.1 }
         );
         
-        // --- GENERAL MODAL LOGIC (openModal / closeModal are now used for all) ---
+        // --- GENERAL MODAL LOGIC (lang, terms, notice, about) ---
         const langModal = document.getElementById("lang-modal");
         const termsModal = document.getElementById("terms-modal");
         const noticeModal = document.getElementById("notice-modal");
@@ -108,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function openModal(modal) {
             if (modal) {
                 modal.classList.remove("hidden");
-                const modalContent = modal.querySelector(".bg-white, .modal-content-product"); // Added product modal content class
+                const modalContent = modal.querySelector(".bg-white");
                 if (modalContent) {
                     modalContent.classList.remove("animate-scale-out");
                     modalContent.classList.add("animate-scale-in");
@@ -121,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function closeModal(modal) {
             if (modal) {
-                const modalContent = modal.querySelector(".bg-white, .modal-content-product"); // Added product modal content class
+                const modalContent = modal.querySelector(".bg-white");
                 if (modalContent) {
                     modalContent.classList.remove("animate-scale-in");
                     modalContent.classList.add("animate-scale-out");
@@ -133,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
+        // Modal Event Listeners (omitted for brevity, assume they are correct)
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
@@ -150,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target === termsModal) closeModal(termsModal);
             if (e.target === noticeModal) closeModal(noticeModal);
             if (e.target === aboutModal) closeModal(aboutModal);
-            // Note: Product modal event is handled separately below.
         });
         document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
@@ -174,23 +173,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // -----------------------------------------------------------
-        // 3. PRODUCTS PAGE LOGIC (Product Grid and Filter ONLY)
+        // 3. PRODUCTS PAGE LOGIC (Product Grid, Filter, and Hash)
         // -----------------------------------------------------------
         
-        let allProducts = [];
+        let allProducts = []; // Stores all fetched product data
         const productGrid = document.querySelector("#product-grid");
-        const filtersContainer = document.getElementById("category-filters"); // Assuming you added this container
+        const filtersContainer = document.getElementById("category-filters"); // New filter container ID
 
         if (productGrid) {
             
             // Product Modal Specific Functions
-            function showProductDetails(product) { // Removed modal argument
-                const modal = document.getElementById("product-modal");
+            function showProductDetails(product, modal) {
                 if (!product || !modal) return;
-
-                // **NOTE:** You MUST update your product modal HTML to have class="modal-content-product" 
-                // on the inner div (the one with the background) for the general closeModal to work properly.
-                const modalContent = modal.querySelector(".modal-content"); 
+                const modalContent = modal.querySelector(".modal-content");
                 const modalImage = document.getElementById("modal-image");
                 const modalName = document.getElementById("modal-name");
                 const modalViscosity = document.getElementById("modal-viscosity");
@@ -204,21 +199,64 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalViscosity.textContent = product.viscosity;
                 modalDescription.textContent = product.description; 
 
-                openModal(modal); // Use general openModal
+                // Force show modal and log class for debug
+                modal.classList.remove("hidden", "opacity-0");
+                modal.classList.add("flex");
+                // Remove any duplicate 'hidden' or 'opacity-0' if present
+                modal.className = modal.className.replace(/\bhidden\b/g, '').replace(/\bopacity-0\b/g, '').replace(/\s+/g, ' ').trim();
+                if (!modal.classList.contains('flex')) modal.classList.add('flex');
+                console.log('Modal class after show:', modal.className);
+            }
+
+            const closeModalProduct = (modal) => {
+                if (!modal) return;
+                modal.classList.add("opacity-0");
+                setTimeout(() => {
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                }, 300);
+            };
+
+            // Function to handle the URL hash (e.g., #3)
+            function handleProductHash(productsData, modal) {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    const productIDFromURL = hash;
+                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
+                    
+                    if (targetProduct) {
+                        showProductDetails(targetProduct, modal);
+                    }
+                }
             }
 
             // Function to generate filter buttons dynamically
             function generateFilterButtons(productsData) {
                 if (!filtersContainer) return;
+                // Get unique categories, ensuring 'all' is not duplicated
                 const categories = [...new Set(productsData.map(p => p.category).filter(c => c))];
                 
-                // Clear all filters except the 'all' button (which is static in HTML)
-                const allButtonHTML = filtersContainer.querySelector('[data-category="all"]').outerHTML;
-                filtersContainer.innerHTML = allButtonHTML;
+                // Always ensure the 'all' button is present
+                filtersContainer.innerHTML = '';
+                const allBtn = document.createElement('button');
+                allBtn.textContent = 'Show All';
+                allBtn.setAttribute('data-category', 'all');
+                allBtn.className = 'filter-btn bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-600 transition duration-300';
+                filtersContainer.appendChild(allBtn);
+
+                // Debug: log categories
+                console.log('Categories found:', categories);
+
+                if (categories.length === 0) {
+                    // Show a message if no categories found
+                    const msg = document.createElement('span');
+                    msg.textContent = 'No categories found.';
+                    filtersContainer.appendChild(msg);
+                }
 
                 categories.forEach(category => {
                     const button = document.createElement('button');
-                    button.textContent = category; 
+                    button.textContent = category;
                     button.setAttribute('data-category', category);
                     button.className = 'filter-btn bg-white text-gray-800 font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-200 transition duration-300';
                     filtersContainer.appendChild(button);
@@ -269,19 +307,15 @@ document.addEventListener("DOMContentLoaded", () => {
                      observer.observe(card);
                 });
                 setLang(currentLang);
-                
-                // Re-attach product detail listeners (since innerHTML overwrote them)
-                attachProductDetailListeners(productsToDisplay);
-            }
-            
-            // New function to attach listeners after grid re-render
-            function attachProductDetailListeners(products) {
+
+                // Re-attach event listeners to new View Details buttons
+                const modal = document.getElementById("product-modal");
                 document.querySelectorAll(".view-details-btn").forEach((button) => {
                     button.addEventListener("click", (e) => {
                         e.stopPropagation();
                         const productId = button.getAttribute("data-product-id");
-                        const product = products.find((p) => p.id == productId);
-                        showProductDetails(product);
+                        const product = allProducts.find((p) => p.id == productId);
+                        showProductDetails(product, modal);
                     });
                 });
             }
@@ -305,23 +339,42 @@ document.addEventListener("DOMContentLoaded", () => {
                     // 3. Display all products by default
                     filterProducts('all');
                     
-                    // 4. Attach modal closing logic for the product modal
+                    // 4. Handle initial URL Hash
                     const modal = document.getElementById("product-modal");
                     const closeModalButton = document.getElementById("close-modal");
 
-                    closeModalButton.addEventListener("click", () => closeModal(modal));
+                    // Event listeners for product details buttons
+                    document.querySelectorAll(".view-details-btn").forEach((button) => {
+                        button.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            const productId = button.getAttribute("data-product-id");
+                            const product = products.find((p) => p.id == productId);
+                            showProductDetails(product, modal);
+                        });
+                    });
+
+                    closeModalButton.addEventListener("click", () => closeModalProduct(modal));
                     modal.addEventListener("click", (e) => {
                         if (e.target === modal) {
-                            closeModal(modal);
+                            closeModalProduct(modal);
                         }
                     });
 
-                    // We NO LONGER call handleProductHash here
+                    handleProductHash(products, modal); 
+
                 })
                 .catch((e) => console.error("Could not load products:", e));
         }
         
-        // We NO LONGER attach window.addEventListener("hashchange", ...) here
+        // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
+        // Handles internal navigation to a product link (e.g., from another page)
+        window.addEventListener("hashchange", () => {
+            const productGrid = document.querySelector("#product-grid");
+            if (productGrid && allProducts.length > 0) {
+                const modal = document.getElementById("product-modal");
+                handleProductHash(allProducts, modal);
+            }
+        });
 
     } // End of initializeApp
 
