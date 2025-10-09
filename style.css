@@ -11,12 +11,13 @@ body {
 }
 
 .hero-gradient {
-  background: linear-gradient(
+  /* background: linear-gradient(
     135deg,
-    var(--feather-color) 0%,   /* Feather */
-    var(--olive-color) 50%,  /* Olive */
-    var(--black-color) 100%  /* Black */
-  );
+    var(--feather-color) 0%,   
+    var(--olive-color) 50%,  
+    var(--black-color) 100%  
+  ); */
+  background: linear-gradient( #c7a653 1%, #e5cc75 50% , #c7a653);
 }
 .product-card:hover .product-overlay {
   opacity: 1;

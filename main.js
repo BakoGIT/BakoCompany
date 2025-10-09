@@ -199,6 +199,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 modalViscosity.textContent = product.viscosity;
                 modalDescription.textContent = product.description; 
 
+                // Fill table
+                const tableBody = document.getElementById('modal-table-body');
+                tableBody.innerHTML = '';
+                if (product.table && product.table.length > 1) {
+                    // Skip first row if it's headers
+                    for (let i = 1; i < product.table.length; i++) {
+                        const row = product.table[i];
+                        const tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            const td = document.createElement('td');
+                            td.className = "px-4 py-2 border-b border-gray-800";
+                            td.textContent = cell;
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    }
+                }
+
                 // Force show modal and log class for debug
                 modal.classList.remove("hidden", "opacity-0");
                 modal.classList.add("flex");
