@@ -1,28 +1,72 @@
-<div class="text-center">
-    <h2 class="text-3xl font-bold text-white mb-4" data-i18n="About Bako">
-        About Bako
-    </h2>
-    <div class="p-8">
-        <p class="text-white mb-6"
-            data-i18n="Bako is a trusted and certified company specializing in high-quality mineral oils and lubricants. We are committed to providing reliable, premium products for automotive and industrial applications.">
-            Bako is a trusted and certified company specializing in
-            high-quality mineral oils and lubricants. We are committed to
-            providing reliable, premium products for automotive and industrial
-            applications.
-        </p>
-        <p class="text-white mb-6"
-            data-i18n="Our oils are manufactured to the highest international standards, ensuring performance, protection, and longevity for your machinery and vehicles.">
-            Our oils are manufactured to the highest international standards,
-            ensuring performance, protection, and longevity for your machinery
-            and vehicles.
-        </p>
-        <p class="text-white mb-3"
-            data-i18n="With years of experience and a reputation for excellence, Bako stands as a symbol of quality and trust in the lubricants industry. Our mission is to deliver innovative solutions and outstanding customer service to our partners and clients worldwide.">
-            With years of experience and a reputation for excellence, Bako
-            stands as a symbol of quality and trust in the lubricants
-            industry. Our mission is to deliver innovative solutions and
-            outstanding customer service to our partners and clients
-            worldwide.
-        </p>
-    </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/x-icon" href="Assets/logo.jpg" />
+        <title data-i18n="BAKO Group">BAKO Group</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+        <body class="font-sans antialiased bg-white text-gray-900 min-h-screen">
+        <div id="header-placeholder"></div>
+            <main class="w-full py-10">
+                <section class="w-full bg-gradient-to-r from-yellow-50 to-white py-12 px-4 md:px-0">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-yellow-700 text-center mb-8 tracking-wide" style="letter-spacing: 2px;">About Bako</h2>
+                    <div class="max-w-4xl  mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                        <div>
+                            <p class="text-lg text-gray-700 mb-6" data-i18n="Bako is a trusted and certified company specializing in high-quality mineral oils and lubricants. We are committed to providing reliable, premium products for automotive and industrial applications.">
+                                Bako is a trusted and certified company specializing in high-quality mineral oils and lubricants. We are committed to providing reliable, premium products for automotive and industrial applications.
+                            </p>
+                            <p class="text-lg text-gray-700 mb-6" data-i18n="Our oils are manufactured to the highest international standards, ensuring performance, protection, and longevity for your machinery and vehicles.">
+                                Our oils are manufactured to the highest international standards, ensuring performance, protection, and longevity for your machinery and vehicles.
+                            </p>
+                            <p class="text-lg text-gray-700 mb-3" data-i18n="With years of experience and a reputation for excellence, Bako stands as a symbol of quality and trust in the lubricants industry. Our mission is to deliver innovative solutions and outstanding customer service to our partners and clients worldwide.">
+                                With years of experience and a reputation for excellence, Bako stands as a symbol of quality and trust in the lubricants industry. Our mission is to deliver innovative solutions and outstanding customer service to our partners and clients worldwide.
+                            </p>
+                        </div>
+                        <div class="flex justify-center items-center">
+                            <img src="Assets/Home/award.png" alt="Bako Factory or Process" class="rounded-2xl shadow-lg w-full max-w-xs border-2 border-blue-200" />
+                        </div>
+                    </div>
+                </section>
+                <section class="w-full bg-gradient-to-r from-yellow-50 to-white py-12 px-4 md:px-0 mt-10">
+                    <div class="max-w-4xl mx-auto">
+                        <h3 class="text-2xl md:text-3xl font-bold text-yellow-700 mb-6 text-center">How We Make Our Car Oils</h3>
+                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                            <div class="flex-1">
+                                <p class="text-gray-700 mb-4 text-lg" data-i18n="Our car oils are produced using advanced refining processes, blending high-quality base oils with state-of-the-art additives to ensure maximum engine protection, performance, and longevity.">
+                                    Our car oils are produced using advanced refining processes, blending high-quality base oils with state-of-the-art additives to ensure maximum engine protection, performance, and longevity.
+                                </p>
+                                <ul class="list-disc list-inside text-gray-700 mb-4">
+                                    <li>Strict quality control at every stage</li>
+                                    <li>Environmentally responsible manufacturing</li>
+                                    <li>Continuous innovation and research</li>
+                                </ul>
+                            </div>
+                            <div class="flex-1 flex justify-center items-center">
+                                <div class="w-full max-w-xs h-48 bg-gray-200 border-2 border-dashed border-blue-400 flex items-center justify-center rounded-lg">
+                                    <span class="text-blue-400">[Add process/factory photo here]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="w-full bg-gradient-to-r from-yellow-50 to-white py-12 px-4 md:px-0 mt-10">
+                    <div class="max-w-4xl mx-auto">
+                        <h3 class="text-2xl md:text-3xl font-bold text-yellow-700 mb-6 text-center">Our Oil Specifications</h3>
+                        <ul class="list-disc list-inside text-gray-700 text-lg mx-auto max-w-2xl">
+                            <li>Meets and exceeds international standards (API, ACEA, etc.)</li>
+                            <li>High viscosity index for optimal performance in all temperatures</li>
+                            <li>Excellent detergency and dispersancy for cleaner engines</li>
+                            <li>Superior oxidation and thermal stability</li>
+                            <li>Low volatility for reduced oil consumption</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+        <div id="footer-placeholder"></div>
+        <script src="main.js"></script>
+    </body>
+</html>
