@@ -1,7 +1,7 @@
 <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
-  <div class="container mx-auto px-4 flex items-center py-3">
+  <div class="container mx-auto px-4 flex items-center justify-between lg:justify-start py-3">
     <!-- Logo -->
-    <div class="flex items-center flex-shrink-0">
+    <div class="flex items-center flex-shrink-0 order-2 lg:order-none">
       <a href="index.html" class="flex items-center">
         <img
           src="Assets/logo.jpg"
@@ -26,7 +26,7 @@
     </nav>
 
     <!-- Language Selector -->
-    <div class="language-selector relative flex hidden lg:flex flex-shrink-0">
+    <div class="language-selector relative flex flex-shrink-0 order-3 lg:order-none">
       <button
         id="open-lang-modal"
         class="flex items-center py-2 rounded-md "
@@ -78,7 +78,7 @@
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-button"
-      class="lg:hidden text-black focus:outline-none p-2 rounded hover:bg-blue-50 transition"
+      class="lg:hidden text-black focus:outline-none p-2 rounded hover:bg-blue-50 transition order-1 lg:order-none"
       aria-label="Open menu"
     >
       <i class="fas fa-bars text-2xl"></i>
@@ -91,12 +91,8 @@
     class="hidden lg:hidden bg-white border-t border-blue-200 transform origin-top transition-all duration-300"
   >
     <div class="container mx-auto px-4 py-4 flex flex-col gap-2">
-      <div class="flex flex-row justify-between items-center">
+      <div>
         <a href="index.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="HOME">홈</a>
-        <button id="open-lang-modal-mobile" class="flex items-center font-bold text-black  transition">
-          <i class="fas fa-globe mr-1"></i>
-          <span>언어</span>
-        </button>
       </div>
       <div>
         <a href="products.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="PRODUCTS">제품</a>
