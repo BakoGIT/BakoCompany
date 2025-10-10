@@ -35,7 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => console.error("Error loading about.html:", error));
 
     const translations = {};
-    let currentLang = localStorage.getItem("lang") || "en";
+    let currentLang = localStorage.getItem("lang") || 'ko';
+    let allProducts = []; // <-- Moved to a global scope for access by product logic and hash listener
 
     function setLang(lang) {
         currentLang = lang;
@@ -132,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
-        // Modal Event Listeners (omitted for brevity, assume they are correct)
+        // Modal Event Listeners
         document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
         document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
@@ -173,12 +174,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // -----------------------------------------------------------
-        // 3. PRODUCTS PAGE LOGIC (Product Grid, Filter, and Hash)
+        // 3. PRODUCTS PAGE LOGIC (Product Grid, Filter, and Hash) - CORRECTED
         // -----------------------------------------------------------
         
-        let allProducts = []; // Stores all fetched product data
         const productGrid = document.querySelector("#product-grid");
-        const filtersContainer = document.getElementById("category-filters"); // New filter container ID
+        const filtersContainer = document.getElementById("category-filters");
 
         if (productGrid) {
             
@@ -217,13 +217,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
 
-                // Force show modal and log class for debug
+                // Force show modal
                 modal.classList.remove("hidden", "opacity-0");
                 modal.classList.add("flex");
-                // Remove any duplicate 'hidden' or 'opacity-0' if present
                 modal.className = modal.className.replace(/\bhidden\b/g, '').replace(/\bopacity-0\b/g, '').replace(/\s+/g, ' ').trim();
                 if (!modal.classList.contains('flex')) modal.classList.add('flex');
-                console.log('Modal class after show:', modal.className);
             }
 
             const closeModalProduct = (modal) => {
@@ -251,32 +249,42 @@ document.addEventListener("DOMContentLoaded", () => {
             // Function to generate filter buttons dynamically
             function generateFilterButtons(productsData) {
                 if (!filtersContainer) return;
-                // Get unique categories, ensuring 'all' is not duplicated
                 const categories = [...new Set(productsData.map(p => p.category).filter(c => c))];
-                
-                // Always ensure the 'all' button is present
+
                 filtersContainer.innerHTML = '';
                 const allBtn = document.createElement('button');
-                allBtn.textContent = 'Show All';
+                allBtn.textContent = translations[currentLang]['Show All'] || 'Show All';
                 allBtn.setAttribute('data-category', 'all');
-                allBtn.className = 'filter-btn bg-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-600 transition duration-300';
+                allBtn.className = 'filter-btn px-3 py-1 mx-1 rounded-full font-semibold transition-all duration-300 focus:outline-none active:scale-95';
+                allBtn.style.backgroundColor = 'white';
+                allBtn.style.color = '#333';
+                allBtn.style.cursor = 'pointer';
+                allBtn.onmouseover = () => {
+                    allBtn.style.backgroundColor = '#cdad59';
+                    allBtn.style.color = 'white';
+                };
+                allBtn.onmouseout = () => {
+                    allBtn.style.backgroundColor = 'white';
+                    allBtn.style.color = '#333';
+                };
                 filtersContainer.appendChild(allBtn);
-
-                // Debug: log categories
-                console.log('Categories found:', categories);
-
-                if (categories.length === 0) {
-                    // Show a message if no categories found
-                    const msg = document.createElement('span');
-                    msg.textContent = 'No categories found.';
-                    filtersContainer.appendChild(msg);
-                }
 
                 categories.forEach(category => {
                     const button = document.createElement('button');
-                    button.textContent = category;
+                    button.textContent = translations[currentLang][category] || category;
                     button.setAttribute('data-category', category);
-                    button.className = 'filter-btn bg-white text-gray-800 font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-200 transition duration-300';
+                    button.className = 'filter-btn px-3 py-1 mx-1 rounded-full font-semibold transition-all duration-300 focus:outline-none active:scale-95';
+                    button.style.backgroundColor = 'white';
+                    button.style.color = '#333';
+                    button.style.cursor = 'pointer';
+                    button.onmouseover = () => {
+                        button.style.backgroundColor = '#cdad59';
+                        button.style.color = 'white';
+                    };
+                    button.onmouseout = () => {
+                        button.style.backgroundColor = 'white';
+                        button.style.color = '#333';
+                    };
                     filtersContainer.appendChild(button);
                 });
             }
@@ -285,14 +293,14 @@ document.addEventListener("DOMContentLoaded", () => {
             function filterProducts(category) {
                 // Update button active state
                 document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.classList.remove('bg-gray-900', 'text-white');
-                    btn.classList.add('bg-white', 'text-gray-800');
+                    btn.style.backgroundColor = 'white';
+                    btn.style.color = '#333';
                 });
-                
+
                 const currentButton = document.querySelector(`[data-category="${category}"]`);
                 if (currentButton) {
-                    currentButton.classList.remove('bg-white', 'text-gray-800', 'bg-gray-700');
-                    currentButton.classList.add('bg-gray-900', 'text-white');
+                    currentButton.style.backgroundColor = '#cdad59';
+                    currentButton.style.color = 'white';
                 }
 
                 productGrid.innerHTML = ""; // Clear the grid
@@ -326,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 setLang(currentLang);
 
-                // Re-attach event listeners to new View Details buttons
+                // *** CRITICAL FIX: RE-ATTACH EVENT LISTENERS TO NEW BUTTONS ***
                 const modal = document.getElementById("product-modal");
                 document.querySelectorAll(".view-details-btn").forEach((button) => {
                     button.addEventListener("click", (e) => {
@@ -357,22 +365,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     // 3. Display all products by default
                     filterProducts('all');
                     
-                    // 4. Handle initial URL Hash
+                    // 4. Setup modal listeners and handle initial URL Hash
                     const modal = document.getElementById("product-modal");
                     const closeModalButton = document.getElementById("close-modal");
 
-                    // Event listeners for product details buttons
-                    document.querySelectorAll(".view-details-btn").forEach((button) => {
-                        button.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            const productId = button.getAttribute("data-product-id");
-                            const product = products.find((p) => p.id == productId);
-                            showProductDetails(product, modal);
-                        });
-                    });
+                    // Event listeners for product details buttons are now managed by filterProducts
 
-                    closeModalButton.addEventListener("click", () => closeModalProduct(modal));
-                    modal.addEventListener("click", (e) => {
+                    closeModalButton?.addEventListener("click", () => closeModalProduct(modal));
+                    
+                    // Close modal when clicking outside the content
+                    modal?.addEventListener("click", (e) => {
                         if (e.target === modal) {
                             closeModalProduct(modal);
                         }
@@ -385,9 +387,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
-        // Handles internal navigation to a product link (e.g., from another page)
         window.addEventListener("hashchange", () => {
             const productGrid = document.querySelector("#product-grid");
+            // Check allProducts.length > 0 to ensure data is loaded before attempting hash resolution
             if (productGrid && allProducts.length > 0) {
                 const modal = document.getElementById("product-modal");
                 handleProductHash(allProducts, modal);

@@ -1,29 +1,32 @@
 <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
-  <div class="container mx-auto px-4 flex justify-between items-center py-3">
+  <div class="container mx-auto px-4 flex items-center py-3">
     <!-- Logo -->
-    <div class="flex items-center">
+    <div class="flex items-center flex-shrink-0">
       <a href="index.html" class="flex items-center">
         <img
           src="Assets/logo.jpg"
           alt="Bako Logo"
-          class="h-12  rounded hero-gradient  shadow"
+          class="h-12 rounded hero-gradient shadow"
         />
-        <span class="ml-2 text-2xl font-extrabold text-black tracking-wide">BAKO</span>
+        <div class="ml-2 flex flex-col">
+          <span class="text-2xl font-extrabold text-black tracking-wide">BAKO</span>
+          <div class="text-xs text-yellow-700" data-i18n="Best Automotive Kinetics Oil & Lubricants">최고의 자동차 운동 에너지 오일 및 윤활유</div>
+        </div>
       </a>
     </div>
 
     <!-- Desktop Navigation -->
-    <nav class="hidden md:flex space-x-8">
-      <a href="index.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition-colors duration-200" data-i18n="HOME">HOME</a>
-      <a href="products.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Products">Products</a>
-      <a href="Certificates.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="CERTIFICATES">Certificates</a>
-      <a href="contact.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Contact Us">Contact Us</a>
-      <a href="about.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="ABOUT">ABOUT</a>
-      <a href="/Assets/Home/BAKO.pdf" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Catalog">Catalog</a>
+    <nav class="hidden lg:flex space-x-8 flex-1 justify-center">
+      <a href="index.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition-colors duration-200" data-i18n="HOME">홈</a>
+      <a href="products.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="PRODUCTS">제품</a>
+      <a href="Certificates.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Certificates">인증서</a>
+      <a href="contact.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Contact Us">문의하기</a>
+      <a href="about.html" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="ABOUT">회사소개</a>
+      <a href="/Assets/Home/BAKO.pdf" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Catalog">목록</a>
     </nav>
 
     <!-- Language Selector -->
-    <div class="language-selector relative flex hidden md:flex">
+    <div class="language-selector relative flex hidden lg:flex flex-shrink-0">
       <button
         id="open-lang-modal"
         class="flex items-center py-2 rounded-md "
@@ -51,7 +54,7 @@
           class="text-xl font-bold mb-4 text-[var(--feather-color)]"
           data-i18n="Select Language"
         >
-          Select Language
+          언어 선택
         </h2>
         <div class="flex flex-col gap-4">
           <button
@@ -75,7 +78,7 @@
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-button"
-      class="md:hidden text-black focus:outline-none p-2 rounded hover:bg-blue-50 transition"
+      class="lg:hidden text-black focus:outline-none p-2 rounded hover:bg-blue-50 transition"
       aria-label="Open menu"
     >
       <i class="fas fa-bars text-2xl"></i>
@@ -85,27 +88,27 @@
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden md:hidden bg-white border-t border-blue-200 transform origin-top transition-all duration-300"
+    class="hidden lg:hidden bg-white border-t border-blue-200 transform origin-top transition-all duration-300"
   >
     <div class="container mx-auto px-4 py-4 flex flex-col gap-2">
       <div class="flex flex-row justify-between items-center">
-        <a href="index.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="HOME">HOME</a>
+        <a href="index.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="HOME">홈</a>
         <button id="open-lang-modal-mobile" class="flex items-center font-bold text-black  transition">
           <i class="fas fa-globe mr-1"></i>
-          <span>Language</span>
+          <span>언어</span>
         </button>
       </div>
       <div>
-        <a href="products.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Products">Products</a>
+        <a href="products.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="PRODUCTS">제품</a>
       </div>
       <div>
-        <a href="Certificates.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="CERTIFICATES">Certificates</a>
+        <a href="Certificates.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Certificates">인증서</a>
       </div>
       <div>
-        <a href="contact.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Contact Us">Contact Us</a>
+        <a href="contact.html" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Contact Us">문의하기</a>
       </div>
       <div>
-        <a href="/Assets/Home/BAKO.pdf" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Catalog">Catalog</a>
+        <a href="/Assets/Home/BAKO.pdf" class="font-bold text-black hover:text-yellow-700 transition" data-i18n="Catalog">목록</a>
       </div>
     </div>
   </div>

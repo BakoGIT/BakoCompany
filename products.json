@@ -4,9 +4,11 @@
     "id": 1,
     "name": "Bako SAE 0W-20 API SP",
     "viscosity": "Petrol Engine Oil",
+    "viscosity_ko": "휘발유 엔진 오일",
     "image": "Assets/Products/0w-20-4l.jpg",
     "category": "Petrol",
-    "color": "#b45309",
+
+    "color": "#3e646a",
     "table":[
   ["APPEARANCE (Visual)", "Bright and Clear", "-", "-"],
   ["COLOR", "L2.0", "ASTM D1500", "-"],
@@ -22,9 +24,10 @@
     "id": 2,
     "name": "Bako SAE 0W-30 API SP",
     "viscosity": "Petrol Engine Oil",
+    "viscosity_ko": "휘발유 엔진 오일",
     "image": "Assets/Products/0w-30-4l.jpg",
     "category": "Petrol",
-    "color": "#b45309",
+    "color": "#3e646a",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -40,10 +43,13 @@
   {
     "id": 3,
     "name": "Bako SAE 5W-30 API SP",
+
     "viscosity": "Petrol Engine Oil",
+    "viscosity_ko": "휘발유 엔진 오일",
     "image": "Assets/Products/5w-30-4l.jpg",
     "category": "Petrol",
-    "color": "#b45309",
+
+    "color": "#5c5c5c",
     "table":[
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -59,10 +65,13 @@
   {
     "id": 4,
     "name": "Bako SAE 5W-40 API SP",
+
     "viscosity": "Petrol Engine Oil – Fully Synthetic",
+    "viscosity_ko": "휘발유 엔진 오일 – 완전 합성",
     "image": "Assets/Products/5w-40-4l.jpg",
     "category": "Petrol",
-    "color": "#b45309",
+
+    "color": "#5c5c5c",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -79,9 +88,11 @@
     "id": 5,
     "name": "Bako SAE 10W-40 API SP",
     "viscosity": "Petrol Engine Oil",
+    "viscosity_ko": "휘발유 엔진 오일",
     "image": "Assets/Products/10w-40-4l.jpg",
     "category": "Petrol",
-    "color": "#b45309",
+
+    "color": "#303030",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -100,7 +111,8 @@
     "viscosity": "Diesel Engine Oil",
     "image": "Assets/Products/5w-30-6l.jpg",
     "category": "Diesel",
-    "color": "#b45309",
+
+    "color": "#5c5c5c",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -117,9 +129,11 @@
     "id": 7,
     "name": "Bako SAE 10W-40 API CI-4",
     "viscosity": "Diesel Engine Oil",
+    "viscosity_ko":"휘발유 엔진 오일 – 완전 합성",
     "image": "Assets/Products/10w-40-6l.jpg",
     "category": "Diesel",
-    "color": "#b45309",
+
+    "color": "#454545",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -136,9 +150,11 @@
     "id": 8,
     "name": "Bako SAE 15W-40 API CI-4",
     "viscosity": "Diesel Engine Oil – Semi Synthetic",
+    "viscosity_ko":"휘발유 엔진 오일 – 반합성",
     "image": "Assets/Products/15w-40-6l.jpg",
     "category": "Diesel",
-    "color": "#b45309",
+
+    "color": "#1665c2",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -155,9 +171,11 @@
     "id": 9,
     "name": "Bako SAE 20W-50 API CI-4",
     "viscosity": "Diesel Engine Oil",
+    "viscosity_ko":"휘발유 엔진 오일 – 반합성",
     "image": "Assets/Products/20w-50-6l.jpg",
     "category": "Diesel",
-    "color": "#b45309",
+
+    "color": "#8c9457",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "L2.0", "ASTM D1500", ""],
@@ -174,9 +192,11 @@
     "id": 10,
     "name": "Bako ATF DEXRON III",
     "viscosity": "Automatic Transmission Fluid",
+    "viscosity_ko":"휘발유 엔진 오일 – 반합성",
     "image": "Assets/Products/Dexron 3.jpg",
     "category": "Lubricants",
-    "color": "#b45309",
+
+    "color": "#b42f30",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["COLOR", "Red", "ASTM D1500", ""],
@@ -193,9 +213,10 @@
     "id": 11,
     "name": "Bako Brake Fluid DOT-4",
     "viscosity": "Brake Fluid",
+    "viscosity_ko":"브레이크 오일",
     "image": "Assets/Products/DOT-4.jpg",
     "category": "Lubricants",
-    "color": "#b45309",
+    "color": "#434350",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
       ["EQUILIBRIUM REFLUX BOILING POINT (ERBP)", "240", "FMVSS 116", "°C"],
