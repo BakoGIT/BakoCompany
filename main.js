@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="p-6 text-center">
                                 <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
                                 <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
-                                <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
+                                <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-i18n="View Details" data-product-id="${product.id}">
                                     View Details
                                 </button>
                             </div>
