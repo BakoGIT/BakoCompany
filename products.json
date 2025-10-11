@@ -168,6 +168,26 @@
     ]
   },
   {
+    "id": 13,
+    "name": "Bako SAE 15W-40 API CI-4",
+    "viscosity": "Diesel Engine Oil – Semi Synthetic",
+    "viscosity_ko":"휘발유 엔진 오일 – 반합성",
+    "image": "Assets/Products/15w-40-1l.jpg",
+    "category": "Diesel",
+    "color": "#1665c2",
+    "table": [
+      ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
+      ["COLOR", "L2.0", "ASTM D1500", ""],
+      ["KINEMATIC VISCOSITY @ 40°C", "118.4", "ASTM D445", "cSt"],
+      ["KINEMATIC VISCOSITY @ 100°C", "14.21", "ASTM D445", "cSt"],
+      ["VISCOSITY INDEX", "120", "ASTM D2270", ""],
+      ["DENSITY @ 15°C", "0.8730", "ASTM D4052", "g/cm3"],
+      ["TOTAL BASE NUMBER (TBN)", "5.36", "ASTM D2896", "mgKOH/g"],
+      ["FLASH POINT (COC)", "226", "ASTM D92", "°C"],
+      ["POUR POINT", "-30", "ASTM D97", "°C"]
+    ]
+  },
+  {
     "id": 9,
     "name": "Bako SAE 20W-50 API CI-4",
     "viscosity": "Diesel Engine Oil",
@@ -175,6 +195,26 @@
     "image": "Assets/Products/20w-50-6l.jpg",
     "category": "Diesel",
 
+    "color": "#8c9457",
+    "table": [
+      ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
+      ["COLOR", "L2.0", "ASTM D1500", ""],
+      ["KINEMATIC VISCOSITY @ 40°C", "169.8", "ASTM D445", "cSt"],
+      ["KINEMATIC VISCOSITY @ 100°C", "18.21", "ASTM D445", "cSt"],
+      ["VISCOSITY INDEX", "119", "ASTM D2270", ""],
+      ["DENSITY @ 15°C", "0.8750", "ASTM D4052", "g/cm3"],
+      ["TOTAL BASE NUMBER (TBN)", "5.24", "ASTM D2896", "mgKOH/g"],
+      ["FLASH POINT (COC)", "230", "ASTM D92", "°C"],
+      ["POUR POINT", "-24", "ASTM D97", "°C"]
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Bako SAE 20W-50 API CI-4",
+    "viscosity": "Diesel Engine Oil",
+    "viscosity_ko":"휘발유 엔진 오일 – 반합성",
+    "image": "Assets/Products/20w-50-20l.jpg",
+    "category": "Diesel",
     "color": "#8c9457",
     "table": [
       ["APPEARANCE (Visual)", "Bright and Clear", "Visual", ""],
