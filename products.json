@@ -5,7 +5,7 @@
     "name": "Bako SAE 0W-20 API SP",
     "viscosity": "Petrol Engine Oil",
     "viscosity_ko": "휘발유 엔진 오일",
-    "image": "Assets/Products/0w-20-4l.jpg",
+    "image": "Assets/Products/14.jpg",
     "category": "Petrol",
 
     "color": "#3e646a",
@@ -25,7 +25,7 @@
     "name": "Bako SAE 0W-30 API SP",
     "viscosity": "Petrol Engine Oil",
     "viscosity_ko": "휘발유 엔진 오일",
-    "image": "Assets/Products/0w-30-4l.jpg",
+    "image": "Assets/Products/13.jpg",
     "category": "Petrol",
     "color": "#3e646a",
     "table": [
@@ -46,7 +46,7 @@
 
     "viscosity": "Petrol Engine Oil",
     "viscosity_ko": "휘발유 엔진 오일",
-    "image": "Assets/Products/5w-30-4l.jpg",
+    "image": "Assets/Products/12.jpg",
     "category": "Petrol",
 
     "color": "#5c5c5c",
