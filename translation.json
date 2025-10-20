@@ -102,6 +102,10 @@
     "FLASH POINT (COC)": "FLASH POINT (COC)",
     "POUR POINT": "POUR POINT",
     "EQUILIBRIUM REFLUX BOILING POINT (ERBP)": "EQUILIBRIUM REFLUX BOILING POINT (ERBP)",
+    "We Lubricate Mobility": "We Lubricate Mobility",
+    "We Lubricate Industry": "We Lubricate Industry",
+    "We Lubricate Mobility": "We Lubricate Mobility",
+    "We Lubricate Industry": "We Lubricate Industry",
     "WET ERBP": "WET ERBP"
     },
     "ko": {
@@ -206,6 +210,8 @@
     "DENSITY @ 15°C": "15°C에서의 밀도",
     "TOTAL BASE NUMBER (TBN)": "총 염기 값 (TBN)" ,
     "FLASH POINT (COC)": "플래시 포인트 (COC)" ,
+    "We Lubricate Mobility": "We Lubricate Mobility",
+    "We Lubricate Industry": "We Lubricate Industry",
     "POUR POINT": "유동점"  ,
     "EQUILIBRIUM REFLUX BOILING POINT (ERBP)": "평형 환류 끓는점 (ERBP)",
     "WET ERBP": "습식 ERBP"
@@ -310,6 +316,8 @@
       "KINEMATIC VISCOSITY @ 100°C": "100°C'de KİNEMATİK VİSKOZİTE",
       "VISCOSITY INDEX": "VİSKOZİTE İNDEKSİ",
       "DENSITY @ 15°C": "15°C'de YOĞUNLUK",
+    "We Lubricate Mobility": "We Lubricate Mobility",
+    "We Lubricate Industry": "We Lubricate Industry",
       "TOTAL BASE NUMBER (TBN)": "TOPLAM BAZ SAYISI (TBN)",
       "FLASH POINT (COC)": "PARLAMA NOKTASI (COC)",
       "POUR POINT": "DONMA NOKTASI",
@@ -414,6 +422,8 @@
       "KIN. VIS. @ 100°C": "VIS. CIN. @ 100°C",
       "KINEMATIC VISCOSITY @ 40°C": "VISCOSITÉ CINÉMATIQUE @ 40°C",
       "KINEMATIC VISCOSITY @ 100°C": "VISCOSITÉ CINÉMATIQUE @ 100°C",
+    "We Lubricate Mobility": "We Lubricate Mobility",
+    "We Lubricate Industry": "We Lubricate Industry",
       "VISCOSITY INDEX": "INDICE DE VISCOSITÉ",
       "DENSITY @ 15°C": "DENSITÉ @ 15°C",
       "TOTAL BASE NUMBER (TBN)": "NOMBRE DE BASE TOTAL (TBN)",
