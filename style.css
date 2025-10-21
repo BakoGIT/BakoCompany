@@ -249,7 +249,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: transparent;
   color: #000;
-  border-color: #f4d16c;
+  border-color: #000000;
   padding: 0.8rem 2rem;
   border-radius: 30px;
   font-size: 0.95rem;
@@ -261,6 +261,7 @@ body {
 
 .btn1:hover {
   background: #f4d16c;
+  border-color: #f4d16c;
   color: #fff;
   transform: scale(1.05);
 }
