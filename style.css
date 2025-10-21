@@ -140,12 +140,13 @@ body {
   align-items: center;
   justify-content: center;
   padding: 5rem 2rem;
-  background: url("Assets/Home/bg-wide.jpg") center/cover no-repeat;
+  background: url("Assets/Home/bg.jpg") center/cover no-repeat;
 }
 
 @media (max-width: 768px) {
   .main-visual {
-    background: url("Assets/Home/bg-mobile.jpg") center/cover no-repeat;
+    background: url("Assets/Home/bg1.jpg") center/cover no-repeat;
+    padding: 1rem 0.5rem;
   }
 }
 
@@ -281,5 +282,11 @@ body {
 
   .card-text h2 {
     font-size: 1.4rem;
+  }
+.btn1 {
+padding: 0.6rem 1rem;
+  }
+  .btn {
+padding: 0.6rem 1rem;
   }
 }
