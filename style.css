@@ -145,7 +145,7 @@ body {
 
 @media (max-width: 768px) {
   .main-visual {
-    background: url("Assets/Home/bg1.jpg") center/cover no-repeat;
+    background: url("Assets/Home/bg.jpg") center/cover no-repeat;
     padding: 1rem 0.5rem;
   }
 }
@@ -291,3 +291,28 @@ padding: 0.6rem 1rem;
 padding: 0.6rem 1rem;
   }
 }
+
+
+/* Footer Social Icons */
+.footer-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  border: 2px solid #f4d16c;
+  color: #f4d16c;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.footer-icon:hover {
+  background: #f4d16c;
+  color: #111;
+  transform: translateY(-3px);
+  box-shadow: 0 0 10px rgba(244, 209, 108, 0.7);
+}
+
+
+
