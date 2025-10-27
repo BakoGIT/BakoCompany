@@ -49,57 +49,70 @@ if (slides.length) {
     });
 }
 
-// لغة الصفحة
-const langBtn = document.getElementById('lang-btn');
-const langList = document.getElementById('lang-list');
-const langSwitcher = document.querySelector('.lang-switcher');
+// --- Language Selection Modal ---
+  // --- Modal open/close ---
+  const openLangModal = document.getElementById("open-lang-modal");
+  const closeLangModal = document.getElementById("close-lang-modal");
+  const langModal = document.getElementById("lang-modal");
 
-langBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    langSwitcher.classList.toggle('active');
-});
-langList.querySelectorAll('li').forEach(li => {
-    li.addEventListener('click', function() {
-        const lang = this.getAttribute('data-lang');
-        changeLang(lang);
-        langSwitcher.classList.remove('active');
+  openLangModal?.addEventListener("click", () => langModal.classList.remove("hidden"));
+  closeLangModal?.addEventListener("click", () => langModal.classList.add("hidden"));
+  langModal?.addEventListener("click", (e) => {
+    if (e.target === langModal) langModal.classList.add("hidden");
+  });
+
+  // --- Load saved or default language ---
+  document.addEventListener("DOMContentLoaded", () => {
+    let savedLang = localStorage.getItem("selectedLanguage");
+
+    // ✅ Set default to Korean on first visit
+    if (!savedLang) {
+      savedLang = "ko";
+      localStorage.setItem("selectedLanguage", savedLang);
+    }
+
+    // ✅ Wait for header/footer to load before applying translations
+    const observer = new MutationObserver(() => {
+      applyLanguage(savedLang);
     });
-});
-document.addEventListener('click', function(e) {
-    langSwitcher.classList.remove('active');
-});
 
-function changeLang(lang) {
-    document.querySelectorAll('[data-en]').forEach(el => {
-        el.textContent = el.getAttribute('data-' + lang);
+    // Observe header & footer containers
+    const header = document.getElementById("header-placeholder");
+    const footer = document.getElementById("footer-placeholder");
+    if (header) observer.observe(header, { childList: true, subtree: true });
+    if (footer) observer.observe(footer, { childList: true, subtree: true });
+
+    // Apply immediately for main page content
+    applyLanguage(savedLang);
+  });
+
+  // --- Apply language translations ---
+  function applyLanguage(lang) {
+    fetch(`lang/${lang}.json`)
+      .then((response) => response.json())
+      .then((translations) => {
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (translations[key]) el.textContent = translations[key];
+        });
+      })
+      .catch((error) => console.error("Translation load error:", error));
+  }
+
+  // --- When user selects a language ---
+  document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selectedLang = btn.getAttribute("data-lang");
+      localStorage.setItem("selectedLanguage", selectedLang); // Save selection
+      applyLanguage(selectedLang); // Apply immediately
+
+      // Re-apply after header/footer reload (if reloaded by navigation)
+      const header = document.getElementById("header-placeholder");
+      const footer = document.getElementById("footer-placeholder");
+      if (header) header.addEventListener("DOMSubtreeModified", () => applyLanguage(selectedLang));
+      if (footer) footer.addEventListener("DOMSubtreeModified", () => applyLanguage(selectedLang));
+
+      langModal.classList.add("hidden");
     });
-}
-
-
-function changeLanguage(lang) {
-  localStorage.setItem('selectedLanguage', lang); // ✅ save selected language
-  applyLanguage(lang);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Get the saved language or use default (English)
-  const savedLang = localStorage.getItem("selectedLanguage") || "en";
-
-  // Apply the saved language
-  applyLanguage(savedLang);
-});
-
-function applyLanguage(lang) {
-  fetch(`lang/${lang}.json`) // or your translations file path
-    .then((response) => response.json())
-    .then((translations) => {
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        const key = el.getAttribute("data-i18n");
-        if (translations[key]) {
-          el.textContent = translations[key];
-        }
-      });
-    })
-    .catch((error) => console.error("Translation load error:", error));
-}
+  });
 

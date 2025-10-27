@@ -72,55 +72,8 @@
   </div>
 </div>
 
-<!-- 💬 Language Switcher Script -->
-<script>
-  // --- Modal open/close ---
-  const openLangModal = document.getElementById("open-lang-modal");
-  const closeLangModal = document.getElementById("close-lang-modal");
-  const langModal = document.getElementById("lang-modal");
 
-  openLangModal.addEventListener("click", () => langModal.classList.remove("hidden"));
-  closeLangModal.addEventListener("click", () => langModal.classList.add("hidden"));
-  langModal.addEventListener("click", (e) => {
-    if (e.target === langModal) langModal.classList.add("hidden");
-  });
 
-  // --- Load saved or default language ---
-  document.addEventListener("DOMContentLoaded", () => {
-    let savedLang = localStorage.getItem("selectedLanguage");
-
-    // ✅ If it's the user's first visit, set default to Korean
-    if (!savedLang) {
-      savedLang = "ko";
-      localStorage.setItem("selectedLanguage", savedLang);
-    }
-
-    applyLanguage(savedLang);
-  });
-
-  // --- Apply language translations ---
-  function applyLanguage(lang) {
-    fetch(`lang/${lang}.json`)
-      .then((response) => response.json())
-      .then((translations) => {
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-          const key = el.getAttribute("data-i18n");
-          if (translations[key]) el.textContent = translations[key];
-        });
-      })
-      .catch((error) => console.error("Translation load error:", error));
-  }
-
-  // --- When user selects a language ---
-  document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selectedLang = btn.getAttribute("data-lang");
-      localStorage.setItem("selectedLanguage", selectedLang); // save new language
-      applyLanguage(selectedLang); // apply immediately
-      langModal.classList.add("hidden"); // close modal
-    });
-  });
-</script>
 
 
     <!-- Mobile Menu Button -->
@@ -160,3 +113,5 @@
     </div>
   </div>
 </header>
+<script src="main.js"></script>
+<script src="script.js"></script>
