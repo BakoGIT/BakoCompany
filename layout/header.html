@@ -27,73 +27,93 @@
       <a href="/Assets/Home/BAKO.pdf" class="nav-link text-black font-semibold hover:text-yellow-700 transition" data-i18n="Catalog">목록</a>
     </nav>
 
-    <!-- Language Selector -->
-    <div class="language-selector relative flex flex-shrink-0 order-3 lg:order-none">
-      <button id="open-lang-modal" class="flex items-center py-2 rounded-md">
-        <i class="fas fa-globe text-black hover:text-yellow-700"></i>
-        <span class="hidden lg:inline ml-1 transition hover:text-yellow-700 text-black">
-          Language
-        </span>
+    <!-- 🌐 Language Selector -->
+<div class="language-selector relative flex flex-shrink-0 order-3 lg:order-none">
+  <button id="open-lang-modal" class="flex items-center py-2 rounded-md">
+    <i class="fas fa-globe text-black hover:text-yellow-700"></i>
+    <span class="hidden lg:inline ml-1 transition hover:text-yellow-700 text-black" data-i18n="Language">
+      Language
+    </span>
+  </button>
+</div>
+
+<!-- 🌐 Language Modal -->
+<div
+  id="lang-modal"
+  class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden"
+>
+  <div class="bg-white rounded-lg shadow-lg p-8 w-80 relative">
+    <button
+      id="close-lang-modal"
+      class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+    >
+      &times;
+    </button>
+    <h2 class="text-xl font-bold mb-4 text-yellow-700" data-i18n="Select Language">
+      Select Language
+    </h2>
+    <div class="flex flex-col gap-4">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="en">
+        English
+      </button>
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="ko">
+        한국어
+      </button>
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="tr">
+        Türkçe
+      </button>
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="fr">
+        Français
+      </button>
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="zh">
+        中文
       </button>
     </div>
+  </div>
+</div>
 
-    <!-- Language Modal -->
-    <div
-      id="lang-modal"
-      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden"
-    >
-      <div class="bg-white rounded-lg shadow-lg p-8 w-80 relative">
-        <button
-          id="close-lang-modal"
-          class="absolute top-2 right-2 text-gray-500 hover:text-[var(--red-color)] text-xl"
-        >
-          &times;
-        </button>
-        <h2
-          class="text-xl font-bold mb-4 text-[var(--feather-color)]"
-          data-i18n="Select Language"
-        >
-          언어 선택
-        </h2>
-        <div class="flex flex-col gap-4">
-          <button
-            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
-            data-lang="en"
-            data-i18n="English"
-          >
-            English
-          </button>
-          <button
-            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
-            data-lang="ko"
-            data-i18n="Korean"
-          >
-            한국어
-          </button>
-          <button
-            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
-            data-lang="tr"
-            data-i18n="Turkish"
-          >
-            Türkçe
-          </button>
-          <button
-            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
-            data-lang="fr"
-            data-i18n="French"
-          >
-            Français
-          </button>
-          <button
-            class="lang-modal-btn bg-gray-100 hover:bg-gray-200 text-[var(--black-color)] font-semibold py-2 rounded"
-            data-lang="zh"
-            data-i18n="Chinese"
-          >
-            中文
-          </button>
-        </div>
-      </div>
-    </div>
+<!-- 💬 Language Switcher Script -->
+<script>
+  // --- Modal open/close ---
+  const openLangModal = document.getElementById("open-lang-modal");
+  const closeLangModal = document.getElementById("close-lang-modal");
+  const langModal = document.getElementById("lang-modal");
+
+  openLangModal.addEventListener("click", () => langModal.classList.remove("hidden"));
+  closeLangModal.addEventListener("click", () => langModal.classList.add("hidden"));
+  langModal.addEventListener("click", (e) => {
+    if (e.target === langModal) langModal.classList.add("hidden");
+  });
+
+  // --- Load saved language on page load ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedLang = localStorage.getItem("selectedLanguage") || "en";
+    applyLanguage(savedLang);
+  });
+
+  // --- Apply selected language ---
+  function applyLanguage(lang) {
+    fetch(`lang/${lang}.json`)
+      .then((response) => response.json())
+      .then((translations) => {
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (translations[key]) el.textContent = translations[key];
+        });
+      })
+      .catch((error) => console.error("Translation load error:", error));
+  }
+
+  // --- When user selects a language ---
+  document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selectedLang = btn.getAttribute("data-lang");
+      localStorage.setItem("selectedLanguage", selectedLang); // save language
+      applyLanguage(selectedLang); // apply immediately
+      langModal.classList.add("hidden"); // close modal
+    });
+  });
+</script>
 
     <!-- Mobile Menu Button -->
     <button

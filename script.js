@@ -74,3 +74,32 @@ function changeLang(lang) {
         el.textContent = el.getAttribute('data-' + lang);
     });
 }
+
+
+function changeLanguage(lang) {
+  localStorage.setItem('selectedLanguage', lang); // ✅ save selected language
+  applyLanguage(lang);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Get the saved language or use default (English)
+  const savedLang = localStorage.getItem("selectedLanguage") || "en";
+
+  // Apply the saved language
+  applyLanguage(savedLang);
+});
+
+function applyLanguage(lang) {
+  fetch(`lang/${lang}.json`) // or your translations file path
+    .then((response) => response.json())
+    .then((translations) => {
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[key]) {
+          el.textContent = translations[key];
+        }
+      });
+    })
+    .catch((error) => console.error("Translation load error:", error));
+}
+
