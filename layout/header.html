@@ -53,19 +53,19 @@
       Select Language
     </h2>
     <div class="flex flex-col gap-4">
-      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="en">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded text-black" data-lang="en">
         English
       </button>
-      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="ko">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded text-black" data-lang="ko">
         한국어
       </button>
-      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="tr">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded text-black" data-lang="tr">
         Türkçe
       </button>
-      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="fr">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded text-black" data-lang="fr">
         Français
       </button>
-      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded" data-lang="zh">
+      <button class="lang-modal-btn bg-gray-100 hover:bg-gray-200 font-semibold py-2 rounded text-black" data-lang="zh">
         中文
       </button>
     </div>
@@ -85,13 +85,20 @@
     if (e.target === langModal) langModal.classList.add("hidden");
   });
 
-  // --- Load saved language on page load ---
+  // --- Load saved or default language ---
   document.addEventListener("DOMContentLoaded", () => {
-    const savedLang = localStorage.getItem("selectedLanguage") || "en";
+    let savedLang = localStorage.getItem("selectedLanguage");
+
+    // ✅ If it's the user's first visit, set default to Korean
+    if (!savedLang) {
+      savedLang = "ko";
+      localStorage.setItem("selectedLanguage", savedLang);
+    }
+
     applyLanguage(savedLang);
   });
 
-  // --- Apply selected language ---
+  // --- Apply language translations ---
   function applyLanguage(lang) {
     fetch(`lang/${lang}.json`)
       .then((response) => response.json())
@@ -108,12 +115,13 @@
   document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const selectedLang = btn.getAttribute("data-lang");
-      localStorage.setItem("selectedLanguage", selectedLang); // save language
+      localStorage.setItem("selectedLanguage", selectedLang); // save new language
       applyLanguage(selectedLang); // apply immediately
       langModal.classList.add("hidden"); // close modal
     });
   });
 </script>
+
 
     <!-- Mobile Menu Button -->
     <button
