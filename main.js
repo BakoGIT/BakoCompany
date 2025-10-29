@@ -1,489 +1,591 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // -----------------------------------------------------------
-    // 1. HELPER FUNCTIONS AND INITIAL SETUP
-    // -----------------------------------------------------------
+    // =================================================================
+    // 1. GLOBAL VARIABLES AND CONFIGURATION
+    // =================================================================
+    
+    const CONFIG = {
+        defaultLang: 'ko',
+        storageKey: 'lang',
+        baseUrl: '',
+        timeout: 5000
+    };
 
-    const loadHTML = (selector, url, callback) => {
-        fetch(url)
-            .then(response => response.text())
+    let currentLang = localStorage.getItem(CONFIG.storageKey) || CONFIG.defaultLang;
+    let allProducts = [];
+    let translations = {};
+    let isInitialized = false;
+
+    // =================================================================
+    // 2. UTILITY FUNCTIONS
+    // =================================================================
+
+    const loadHTML = (selector, url, callback = null) => {
+        if (!selector || !url) {
+            console.error('Invalid selector or URL for loadHTML');
+            return Promise.reject(new Error('Invalid parameters'));
+        }
+
+        return fetch(url, { timeout: CONFIG.timeout })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
             .then(data => {
                 const element = document.querySelector(selector);
                 if (element) {
                     element.innerHTML = data;
+                    callback && callback();
                 } else {
                     console.error(`Element with selector ${selector} not found.`);
                 }
-                if (callback) {
-                    callback();
-                }
             })
-            .catch(error => console.error(`Error loading ${url}:`, error));
+            .catch(error => {
+                console.error(`Error loading ${url}:`, error);
+                throw error;
+            });
     };
-    
-    // Load common parts
-    loadHTML("#footer-placeholder", "layout/footer.html");
 
-    // Load about.html into the modal placeholder
-    fetch("about.html")
-        .then((response) => response.text())
-        .then((data) => {
-            const placeholder = document.getElementById("about-modal-placeholder");
-            if (placeholder) {
-                placeholder.innerHTML = data;
-            }
-        })
-        .catch((error) => console.error("Error loading about.html:", error));
-
-    const translations = {};
-    let currentLang = localStorage.getItem("lang") || 'ko';
-    let allProducts = []; // <-- Moved to a global scope for access by product logic and hash listener
-
-    function setLang(lang) {
-        currentLang = lang;
-        localStorage.setItem("lang", lang);
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-            const key = el.getAttribute("data-i18n");
-            if (translations[lang] && translations[lang][key]) {
-                el.innerText = translations[lang][key];
-            }
-        });
-        const langBtnSpans = document.querySelectorAll(".language-selector span");
-        langBtnSpans.forEach((span) => {
-            if (span) span.innerText = lang.toUpperCase();
-        });
-
-        const event = new CustomEvent("languageChange", { detail: { lang: lang } });
-        window.dispatchEvent(event);
-    }
-
-    // -----------------------------------------------------------
-    // 2. MAIN APPLICATION INITIALIZATION
-    // -----------------------------------------------------------
-
-    function initializeApp() {
-        // --- MOBILE MENU / SMOOTH SCROLLING / INTERSECTION OBSERVER ---
-        const mobileMenuButton = document.getElementById("mobile-menu-button");
-        const mobileMenu = document.getElementById("mobile-menu");
-        if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener("click", function () {
-                const body = document.body;
-                if (mobileMenu.classList.contains("hidden")) {
-                    mobileMenu.classList.remove("hidden");
-                    setTimeout(() => mobileMenu.classList.remove("scale-y-0"), 10);
-                    body.classList.add("mobile-menu-open");
-                } else {
-                    mobileMenu.classList.add("scale-y-0");
-                    setTimeout(() => mobileMenu.classList.add("hidden"), 300);
-                    body.classList.remove("mobile-menu-open");
-                }
-            });
-        }
-        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-            anchor.addEventListener("click", function (e) {
-                e.preventDefault();
-                const targetElement = document.querySelector(this.getAttribute("href"));
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
-            });
-        });
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("animate-fadeIn");
-                    }
-                });
-            },
-            { threshold: 0.1 }
-        );
-        
-        // --- GENERAL MODAL LOGIC (lang, terms, notice, about) ---
-        const langModal = document.getElementById("lang-modal");
-        const termsModal = document.getElementById("terms-modal");
-        const noticeModal = document.getElementById("notice-modal");
-        const aboutModal = document.getElementById("about-modal");
-
-        function openModal(modal) {
-            if (modal) {
-                modal.classList.remove("hidden");
-                const modalContent = modal.querySelector(".bg-white");
-                if (modalContent) {
-                    modalContent.classList.remove("animate-scale-out");
-                    modalContent.classList.add("animate-scale-in");
-                }
-                setTimeout(() => {
-                    modal.classList.remove("opacity-0");
-                }, 10);
-            }
+    const loadJSON = (url) => {
+        if (!url) {
+            return Promise.reject(new Error('Invalid URL'));
         }
 
-        function closeModal(modal) {
-            if (modal) {
-                const modalContent = modal.querySelector(".bg-white");
-                if (modalContent) {
-                    modalContent.classList.remove("animate-scale-in");
-                    modalContent.classList.add("animate-scale-out");
+        return fetch(url, { timeout: CONFIG.timeout })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                modal.classList.add("opacity-0");
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                }, 300);
+                return response.json();
+            })
+            .catch(error => {
+                console.error(`Error loading JSON from ${url}:`, error);
+                throw error;
+            });
+    };
+
+    const safeQuerySelector = (selector) => {
+        try {
+            return document.querySelector(selector);
+        } catch (error) {
+            console.error('Invalid selector:', selector, error);
+            return null;
+        }
+    };
+
+    const safeQuerySelectorAll = (selector) => {
+        try {
+            return document.querySelectorAll(selector);
+        } catch (error) {
+            console.error('Invalid selector:', selector, error);
+            return [];
+        }
+    };
+
+    // =================================================================
+    // 3. LANGUAGE MANAGEMENT
+    // =================================================================
+
+    const applyTranslations = (lang) => {
+        try {
+            if (!translations[lang]) {
+                console.warn(`No translations found for language: ${lang}`);
+                return;
             }
-        }
-        
-        // Modal Event Listeners
-        document.getElementById("open-lang-modal")?.addEventListener("click", () => openModal(langModal));
-        document.getElementById("open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
-        document.getElementById("terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
-        document.getElementById("notice-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(noticeModal); });
-        document.getElementById("footer-about-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(aboutModal); });
-        document.getElementById("close-lang-modal")?.addEventListener("click", () => closeModal(langModal));
-        document.getElementById("close-terms-modal")?.addEventListener("click", () => closeModal(termsModal));
-        document.getElementById("close-notice-modal")?.addEventListener("click", () => closeModal(noticeModal));
-        document.getElementById("close-about-modal")?.addEventListener("click", () => closeModal(aboutModal));
-        document.getElementById("close-terms-modal-button")?.addEventListener("click", () => closeModal(termsModal));
-        document.getElementById("close-notice-modal-button")?.addEventListener("click", () => closeModal(noticeModal));
-        document.getElementById("close-about-modal-button")?.addEventListener("click", () => closeModal(aboutModal));
-        window.addEventListener("click", (e) => {
-            if (e.target === langModal) closeModal(langModal);
-            if (e.target === termsModal) closeModal(termsModal);
-            if (e.target === noticeModal) closeModal(noticeModal);
-            if (e.target === aboutModal) closeModal(aboutModal);
-        });
-        document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const lang = btn.getAttribute("data-lang");
-                setLang(lang);
-                closeModal(langModal);
-            });
-        });
 
-        // --- CONTACT FORM LOGIC ---
-        const contactForm = document.getElementById("contact-form");
-        if (contactForm) {
-            contactForm.addEventListener("submit", function (event) {
-                event.preventDefault();
-                const message = document.getElementById("message").value;
-                const toEmail = "Abd.bako.company@gmail.com";
-                const subject = "Message from Website Contact Form";
-                const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-                window.location.href = mailtoLink;
+            const elements = safeQuerySelectorAll("[data-i18n]");
+            elements.forEach(element => {
+                const key = element.getAttribute("data-i18n");
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
             });
-        }
-        
-        // -----------------------------------------------------------
-        // 3. PRODUCTS PAGE LOGIC (Product Grid, Filter, and Hash) - CORRECTED
-        // -----------------------------------------------------------
-        
-        const productGrid = document.querySelector("#product-grid");
-        const filtersContainer = document.getElementById("category-filters");
 
-        if (productGrid) {
+            // Update language button text
+            const langBtnSpans = safeQuerySelectorAll(".language-selector span");
+            langBtnSpans.forEach(span => {
+                if (span) span.textContent = lang.toUpperCase();
+            });
+
+            const event = new CustomEvent("languageChange", { 
+                detail: { lang: lang } 
+            });
+            window.dispatchEvent(event);
+        } catch (error) {
+            console.error('Error applying translations:', error);
+        }
+    };
+
+    const setLanguage = (lang) => {
+        try {
+            if (!lang || typeof lang !== 'string') {
+                console.error('Invalid language parameter');
+                return;
+            }
+
+            currentLang = lang;
+            localStorage.setItem(CONFIG.storageKey, lang);
+            applyTranslations(lang);
+        } catch (error) {
+            console.error('Error setting language:', error);
+        }
+    };
+
+    const loadTranslations = async (lang) => {
+        try {
+            const data = await loadJSON('translation.json');
+            translations = { ...translations, ...data };
+            return data;
+        } catch (error) {
+            console.error('Failed to load translations:', error);
+            throw error;
+        }
+    };
+
+    // =================================================================
+    // 4. MODAL MANAGEMENT
+    // =================================================================
+
+    const openModal = (modal) => {
+        if (!modal) {
+            console.error('Modal element is null');
+            return;
+        }
+
+        try {
+            modal.classList.remove("hidden");
+            const modalContent = modal.querySelector(".bg-white");
+            if (modalContent) {
+                modalContent.classList.remove("animate-scale-out");
+                modalContent.classList.add("animate-scale-in");
+            }
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+            }, 10);
+        } catch (error) {
+            console.error('Error opening modal:', error);
+        }
+    };
+
+    const closeModal = (modal) => {
+        if (!modal) return;
+
+        try {
+            const modalContent = modal.querySelector(".bg-white");
+            if (modalContent) {
+                modalContent.classList.remove("animate-scale-in");
+                modalContent.classList.add("animate-scale-out");
+            }
+            modal.classList.add("opacity-0");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }, 300);
+        } catch (error) {
+            console.error('Error closing modal:', error);
+        }
+    };
+
+    // =================================================================
+    // 5. PRODUCTS MANAGEMENT
+    // =================================================================
+
+    const showProductDetails = (product, modal) => {
+        if (!product || !modal) return;
+
+        try {
+            const modalContent = modal.querySelector(".modal-content");
+            const modalImage = safeQuerySelector("#modal-image");
+            const modalName = safeQuerySelector("#modal-name");
+            const modalViscosity = safeQuerySelector("#modal-viscosity");
+            const modalDescription = safeQuerySelector("#modal-description");
             
-            // Product Modal Specific Functions
-            function showProductDetails(product, modal) {
-                if (!product || !modal) return;
-                const modalContent = modal.querySelector(".modal-content");
-                const modalImage = document.getElementById("modal-image");
-                const modalName = document.getElementById("modal-name");
-                const modalViscosity = document.getElementById("modal-viscosity");
-                const modalDescription = document.getElementById("modal-description");
-                
-                const gradient = `linear-gradient(135deg, ${product.color} 0%, #1a202c 100%)`;
-                modalContent.style.background = gradient;
-
-                modalImage.src = product.image;
-                modalName.textContent = product.name;
-                modalViscosity.textContent = product.viscosity;
-                modalDescription.textContent = product.description; 
-
-                // Fill table
-                const tableBody = document.getElementById('modal-table-body');
-                tableBody.innerHTML = '';
-                if (product.table && product.table.length > 1) {
-                    // Skip first row if it's headers
-                    for (let i = 1; i < product.table.length; i++) {
-                        const row = product.table[i];
-                        const tr = document.createElement('tr');
-                        row.forEach(cell => {
-                            const td = document.createElement('td');
-                            td.className = "px-4 py-2 border-b border-gray-800";
-                            td.textContent = cell;
-                            tr.appendChild(td);
-                        });
-                        tableBody.appendChild(tr);
-                    }
-                }
-
-                // Force show modal
-                modal.classList.remove("hidden", "opacity-0");
-                modal.classList.add("flex");
-                modal.className = modal.className.replace(/\bhidden\b/g, '').replace(/\bopacity-0\b/g, '').replace(/\s+/g, ' ').trim();
-                if (!modal.classList.contains('flex')) modal.classList.add('flex');
+            if (!modalContent || !modalImage || !modalName || !modalViscosity || !modalDescription) {
+                console.error('Missing modal elements');
+                return;
             }
 
-            const closeModalProduct = (modal) => {
-                if (!modal) return;
-                modal.classList.add("opacity-0");
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                    modal.classList.remove("flex");
-                }, 300);
+            const gradient = `linear-gradient(135deg, ${product.color || '#666'} 0%, #1a202c 100%)`;
+            modalContent.style.background = gradient;
+
+            modalImage.src = product.image || '';
+            modalName.textContent = product.name || '';
+            modalViscosity.textContent = product.viscosity || '';
+            modalDescription.textContent = product.description || ''; 
+
+            // Fill table
+            const tableBody = safeQuerySelector('#modal-table-body');
+            if (tableBody && product.table && product.table.length > 1) {
+                tableBody.innerHTML = '';
+                for (let i = 1; i < product.table.length; i++) {
+                    const row = product.table[i];
+                    const tr = document.createElement('tr');
+                    row.forEach(cell => {
+                        const td = document.createElement('td');
+                        td.className = "px-4 py-2 border-b border-gray-800";
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                }
+            }
+
+            // Show modal
+            modal.classList.remove("hidden", "opacity-0");
+            modal.classList.add("flex");
+        } catch (error) {
+            console.error('Error showing product details:', error);
+        }
+    };
+
+    const handleProductHash = (productsData, modal) => {
+        try {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return;
+
+            const productIDFromURL = hash;
+            const targetProduct = productsData.find(p => p.id == productIDFromURL);
+            
+            if (targetProduct) {
+                showProductDetails(targetProduct, modal);
+            }
+        } catch (error) {
+            console.error('Error handling product hash:', error);
+        }
+    };
+
+    const generateFilterButtons = (productsData) => {
+        const filtersContainer = safeQuerySelector("#category-filters");
+        if (!filtersContainer || !productsData.length) return;
+
+        try {
+            const categories = [...new Set(productsData.map(p => p.category).filter(c => c))];
+            filtersContainer.innerHTML = '';
+
+            const createFilterButton = (category) => {
+                const button = document.createElement('button');
+                button.textContent = translations[currentLang]?.[category] || category;
+                button.setAttribute('data-category', category);
+                button.className = 'filter-btn px-3 py-1 mx-1 rounded-full font-semibold transition-all duration-300 focus:outline-none active:scale-95';
+                
+                // Style the button
+                Object.assign(button.style, {
+                    backgroundColor: 'white',
+                    color: '#333',
+                    cursor: 'pointer'
+                });
+
+                const setHoverStyles = (isHover) => {
+                    button.style.backgroundColor = isHover ? '#cdad59' : 'white';
+                    button.style.color = isHover ? 'white' : '#333';
+                };
+
+                button.addEventListener('mouseenter', () => setHoverStyles(true));
+                button.addEventListener('mouseleave', () => setHoverStyles(false));
+                
+                return button;
             };
 
-            // Function to handle the URL hash (e.g., #3)
-            function handleProductHash(productsData, modal) {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    const productIDFromURL = hash;
-                    const targetProduct = productsData.find(p => p.id == productIDFromURL);
-                    
-                    if (targetProduct) {
-                        showProductDetails(targetProduct, modal);
-                    }
-                }
-            }
+            // Create "Show All" button
+            const allBtn = createFilterButton('all');
+            allBtn.textContent = translations[currentLang]?.['Show All'] || 'Show All';
+            filtersContainer.appendChild(allBtn);
 
-            // Function to generate filter buttons dynamically
-            function generateFilterButtons(productsData) {
-                if (!filtersContainer) return;
-                const categories = [...new Set(productsData.map(p => p.category).filter(c => c))];
+            // Create category buttons
+            categories.forEach(category => {
+                const button = createFilterButton(category);
+                filtersContainer.appendChild(button);
+            });
+        } catch (error) {
+            console.error('Error generating filter buttons:', error);
+        }
+    };
 
-                filtersContainer.innerHTML = '';
-                const allBtn = document.createElement('button');
-                allBtn.textContent = translations[currentLang]['Show All'] || 'Show All';
-                allBtn.setAttribute('data-category', 'all');
-                allBtn.className = 'filter-btn px-3 py-1 mx-1 rounded-full font-semibold transition-all duration-300 focus:outline-none active:scale-95';
-                allBtn.style.backgroundColor = 'white';
-                allBtn.style.color = '#333';
-                allBtn.style.cursor = 'pointer';
-                allBtn.onmouseover = () => {
-                    allBtn.style.backgroundColor = '#cdad59';
-                    allBtn.style.color = 'white';
-                };
-                allBtn.onmouseout = () => {
-                    allBtn.style.backgroundColor = 'white';
-                    allBtn.style.color = '#333';
-                };
-                filtersContainer.appendChild(allBtn);
+    const filterProducts = (category) => {
+        const productGrid = safeQuerySelector("#product-grid");
+        if (!productGrid) return;
 
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = translations[currentLang][category] || category;
-                    button.setAttribute('data-category', category);
-                    button.className = 'filter-btn px-3 py-1 mx-1 rounded-full font-semibold transition-all duration-300 focus:outline-none active:scale-95';
-                    button.style.backgroundColor = 'white';
-                    button.style.color = '#333';
-                    button.style.cursor = 'pointer';
-                    button.onmouseover = () => {
-                        button.style.backgroundColor = '#cdad59';
-                        button.style.color = 'white';
-                    };
-                    button.onmouseout = () => {
-                        button.style.backgroundColor = 'white';
-                        button.style.color = '#333';
-                    };
-                    filtersContainer.appendChild(button);
+        try {
+            // Update button styles
+            safeQuerySelectorAll('.filter-btn').forEach(btn => {
+                Object.assign(btn.style, {
+                    backgroundColor: 'white',
+                    color: '#333'
+                });
+            });
+
+            const currentButton = safeQuerySelector(`[data-category="${category}"]`);
+            if (currentButton) {
+                Object.assign(currentButton.style, {
+                    backgroundColor: '#cdad59',
+                    color: 'white'
                 });
             }
 
-            // Function to apply filtering and re-render the grid
-            function filterProducts(category) {
-                // Update button active state
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.style.backgroundColor = 'white';
-                    btn.style.color = '#333';
-                });
+            productGrid.innerHTML = "";
 
-                const currentButton = document.querySelector(`[data-category="${category}"]`);
-                if (currentButton) {
-                    currentButton.style.backgroundColor = '#cdad59';
-                    currentButton.style.color = 'white';
-                }
+            const productsToDisplay = category === 'all' 
+                ? allProducts 
+                : allProducts.filter(p => p.category === category);
 
-                productGrid.innerHTML = ""; // Clear the grid
+            if (!productsToDisplay.length) {
+                productGrid.innerHTML = '<p class="text-center text-gray-600">No products found.</p>';
+                return;
+            }
 
-                const productsToDisplay = (category === 'all') 
-                    ? allProducts 
-                    : allProducts.filter(p => p.category === category);
-
-                // Rebuild and display filtered product cards
-                productsToDisplay.forEach((product) => {
-                    const gradient = `linear-gradient(135deg, ${product.color} 0%, #2C3E50 100%)`;
-                    productGrid.innerHTML += `
-                        <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
-                            <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
-                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="p-6 text-center">
-                                <h2 class="text-xl font-bold mb-2 text-white">${product.name}</h2>
-                                <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity}</p>
-                                <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-i18n="View Details" data-product-id="${product.id}">
-                                    View Details
-                                </button>
-                            </div>
+            // Generate product cards
+            productsToDisplay.forEach((product) => {
+                const gradient = `linear-gradient(135deg, ${product.color || '#666'} 0%, #2C3E50 100%)`;
+                const productCard = `
+                    <div class="product-card rounded-xl shadow-lg text-white" style="background: ${gradient};">
+                        <div class="image-wrapper rounded-t-xl overflow-hidden p-4">
+                            <img src="${product.image || ''}" alt="${product.name || ''}" class="w-full h-full object-cover">
                         </div>
-                    `;
+                        <div class="p-6 text-center">
+                            <h2 class="text-xl font-bold mb-2 text-white">${product.name || ''}</h2>
+                            <p class="text-gray-200 font-bold text-lg mb-4">${product.viscosity || ''}</p>
+                            <button class="view-details-btn w-full bg-white/20 backdrop-blur-sm text-white py-2 px-4 rounded-lg font-bold hover:bg-white/30 transition-all duration-300" data-product-id="${product.id}">
+                                ${translations[currentLang]?.['View Details'] || 'View Details'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productGrid.innerHTML += productCard;
+            });
+            
+            // Reapply observers and language
+            safeQuerySelectorAll(".product-card").forEach(card => {
+                observer.observe(card);
+            });
+            applyTranslations(currentLang);
+
+            // Attach event listeners
+            const modal = safeQuerySelector("#product-modal");
+            safeQuerySelectorAll(".view-details-btn").forEach(button => {
+                button.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const productId = button.getAttribute("data-product-id");
+                    const product = allProducts.find((p) => p.id == productId);
+                    showProductDetails(product, modal);
+                });
+            });
+        } catch (error) {
+            console.error('Error filtering products:', error);
+        }
+    };
+
+    // =================================================================
+    // 6. EVENT LISTENERS AND INITIALIZATION
+    // =================================================================
+
+    const setupEventListeners = () => {
+        try {
+            // Mobile menu
+            const mobileMenuButton = safeQuerySelector("#mobile-menu-button");
+            const mobileMenu = safeQuerySelector("#mobile-menu");
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener("click", function () {
+                    const body = document.body;
+                    if (mobileMenu.classList.contains("hidden")) {
+                        mobileMenu.classList.remove("hidden");
+                        setTimeout(() => mobileMenu.classList.remove("scale-y-0"), 10);
+                        body.classList.add("mobile-menu-open");
+                    } else {
+                        mobileMenu.classList.add("scale-y-0");
+                        setTimeout(() => mobileMenu.classList.add("hidden"), 300);
+                        body.classList.remove("mobile-menu-open");
+                    }
+                });
+            }
+
+            // Smooth scrolling
+            safeQuerySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const targetElement = safeQuerySelector(this.getAttribute("href"));
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                });
+            });
+
+            // Modal event listeners
+            const langModal = safeQuerySelector("#lang-modal");
+            const termsModal = safeQuerySelector("#terms-modal");
+            const noticeModal = safeQuerySelector("#notice-modal");
+            const aboutModal = safeQuerySelector("#about-modal");
+
+            safeQuerySelector("#open-lang-modal")?.addEventListener("click", () => openModal(langModal));
+            safeQuerySelector("#open-lang-modal-mobile")?.addEventListener("click", () => openModal(langModal));
+            safeQuerySelector("#terms-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(termsModal); });
+            safeQuerySelector("#notice-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(noticeModal); });
+            safeQuerySelector("#footer-about-link")?.addEventListener("click", (e) => { e.preventDefault(); openModal(aboutModal); });
+            safeQuerySelector("#close-lang-modal")?.addEventListener("click", () => closeModal(langModal));
+            safeQuerySelector("#close-terms-modal")?.addEventListener("click", () => closeModal(termsModal));
+            safeQuerySelector("#close-notice-modal")?.addEventListener("click", () => closeModal(noticeModal));
+            safeQuerySelector("#close-about-modal")?.addEventListener("click", () => closeModal(aboutModal));
+            safeQuerySelector("#close-terms-modal-button")?.addEventListener("click", () => closeModal(termsModal));
+            safeQuerySelector("#close-notice-modal-button")?.addEventListener("click", () => closeModal(noticeModal));
+            safeQuerySelector("#close-about-modal-button")?.addEventListener("click", () => closeModal(aboutModal));
+
+            // Close modal when clicking outside
+            window.addEventListener("click", (e) => {
+                if (e.target === langModal) closeModal(langModal);
+                if (e.target === termsModal) closeModal(termsModal);
+                if (e.target === noticeModal) closeModal(noticeModal);
+                if (e.target === aboutModal) closeModal(aboutModal);
+            });
+
+            // Language selection
+            safeQuerySelectorAll(".lang-modal-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const lang = btn.getAttribute("data-lang");
+                    if (lang) {
+                        setLanguage(lang);
+                        closeModal(langModal);
+                    }
+                });
+            });
+
+            // Contact form
+            const contactForm = safeQuerySelector("#contact-form");
+            if (contactForm) {
+                contactForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    const messageElement = safeQuerySelector("#message");
+                    if (!messageElement) return;
+
+                    const message = messageElement.value.trim();
+                    if (!message) {
+                        alert('Please enter a message.');
+                        return;
+                    }
+
+                    const toEmail = "Abd.bako.company@gmail.com";
+                    const subject = "Message from Website Contact Form";
+                    const mailtoLink = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                    window.location.href = mailtoLink;
+                });
+            }
+
+        } catch (error) {
+            console.error('Error setting up event listeners:', error);
+        }
+    };
+
+    const setupProductPage = async () => {
+        try {
+            const productGrid = safeQuerySelector("#product-grid");
+            if (!productGrid) return;
+
+            const products = await loadJSON("products.json");
+            allProducts = products;
+
+            // Generate and attach filters
+            generateFilterButtons(products);
+
+            // Attach filter event listeners
+            safeQuerySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const category = button.getAttribute('data-category');
+                    if (category) {
+                        filterProducts(category);
+                    }
+                });
+            });
+
+            // Display all products by default
+            filterProducts('all');
+
+            // Setup modal
+            const modal = safeQuerySelector("#product-modal");
+            const closeModalButton = safeQuerySelector("#close-modal");
+
+            if (closeModalButton) {
+                closeModalButton.addEventListener("click", () => {
+                    closeModal(modal);
+                });
+            }
+
+            if (modal) {
+                modal.addEventListener("click", (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            }
+
+            // Handle URL hash
+            handleProductHash(products, modal);
+        } catch (error) {
+            console.error('Error setting up product page:', error);
+        }
+    };
+
+    // =================================================================
+    // 7. MAIN APPLICATION INITIALIZATION
+    // =================================================================
+
+    const initializeApp = async () => {
+        try {
+            if (isInitialized) return;
+            isInitialized = true;
+
+            // Load header first, then load common parts and initialize
+            loadHTML("#header-placeholder", "layout/header.html", () => {
+                loadHTML("#footer-placeholder", "layout/footer.html");
+                loadHTML("#about-modal-placeholder", "about.html");
+                
+                // Load translations and apply language
+                loadTranslations(currentLang).then(() => {
+                    applyTranslations(currentLang);
+                }).catch(error => {
+                    console.error('Failed to load translations:', error);
+                    // Continue with default language
                 });
                 
-                // Reapply Intersection Observer and set language on new cards
-                document.querySelectorAll(".product-card").forEach((card) => {
-                     observer.observe(card);
-                });
-                setLang(currentLang);
-
-                // *** CRITICAL FIX: RE-ATTACH EVENT LISTENERS TO NEW BUTTONS ***
-                const modal = document.getElementById("product-modal");
-                document.querySelectorAll(".view-details-btn").forEach((button) => {
-                    button.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        const productId = button.getAttribute("data-product-id");
-                        const product = allProducts.find((p) => p.id == productId);
-                        showProductDetails(product, modal);
-                    });
-                });
-            }
-
-            fetch("products.json")
-                .then((response) => response.json())
-                .then((products) => {
-                    allProducts = products; 
-                    
-                    // 1. Generate and attach filters
-                    generateFilterButtons(products);
-
-                    // 2. Attach filter event listeners
-                    document.querySelectorAll('.filter-btn').forEach(button => {
-                        button.addEventListener('click', () => {
-                            const category = button.getAttribute('data-category');
-                            filterProducts(category);
-                        });
-                    });
-
-                    // 3. Display all products by default
-                    filterProducts('all');
-                    
-                    // 4. Setup modal listeners and handle initial URL Hash
-                    const modal = document.getElementById("product-modal");
-                    const closeModalButton = document.getElementById("close-modal");
-
-                    // Event listeners for product details buttons are now managed by filterProducts
-
-                    closeModalButton?.addEventListener("click", () => closeModalProduct(modal));
-                    
-                    // Close modal when clicking outside the content
-                    modal?.addEventListener("click", (e) => {
-                        if (e.target === modal) {
-                            closeModalProduct(modal);
-                        }
-                    });
-
-                    handleProductHash(products, modal); 
-
-                })
-                .catch((e) => console.error("Could not load products:", e));
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Load products if on products page
+                setupProductPage();
+            });
+            
+        } catch (error) {
+            console.error('Error initializing application:', error);
         }
-        
-        // 💡 HASH CHANGE LISTENER (Correctly placed inside initializeApp)
-        window.addEventListener("hashchange", () => {
-            const productGrid = document.querySelector("#product-grid");
-            // Check allProducts.length > 0 to ensure data is loaded before attempting hash resolution
-            if (productGrid && allProducts.length > 0) {
-                const modal = document.getElementById("product-modal");
-                handleProductHash(allProducts, modal);
-            }
-        });
+    };
 
-    } // End of initializeApp
+    // =================================================================
+    // 8. INTERSECTION OBSERVER FOR ANIMATIONS
+    // =================================================================
 
-    // -----------------------------------------------------------
-    // 4. STARTUP SEQUENCE
-    // -----------------------------------------------------------
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("animate-fadeIn");
+                }
+            });
+        },
+        { threshold: 0.1 }
+    );
 
-    // Fetch translations, then load the header and start the app
-    fetch("translation.json")
-        .then((res) => res.json())
-        .then((data) => {
-            Object.assign(translations, data);
-            setLang(currentLang);
-            loadHTML("#header-placeholder", "layout/header.html", initializeApp);
-        })
-        .catch((e) => console.error("Could not load translations:", e));
-});
+    // =================================================================
+    // 9. STARTUP SEQUENCE
+    // =================================================================
 
-// --- Language Selection Modal ---
-  // --- Modal open/close ---
-  const openLangModal = document.getElementById("open-lang-modal");
-  const closeLangModal = document.getElementById("close-lang-modal");
-  const langModal = document.getElementById("lang-modal");
-
-  openLangModal?.addEventListener("click", () => langModal.classList.remove("hidden"));
-  closeLangModal?.addEventListener("click", () => langModal.classList.add("hidden"));
-  langModal?.addEventListener("click", (e) => {
-    if (e.target === langModal) langModal.classList.add("hidden");
-  });
-
-  // --- Load saved or default language ---
-  document.addEventListener("DOMContentLoaded", () => {
-    let savedLang = localStorage.getItem("selectedLanguage");
-
-    // ✅ Set default to Korean on first visit
-    if (!savedLang) {
-      savedLang = "ko";
-      localStorage.setItem("selectedLanguage", savedLang);
-    }
-
-    // ✅ Wait for header/footer to load before applying translations
-    const observer = new MutationObserver(() => {
-      applyLanguage(savedLang);
+    // Initialize the application
+    initializeApp().catch(error => {
+        console.error('Application initialization failed:', error);
     });
 
-    // Observe header & footer containers
-    const header = document.getElementById("header-placeholder");
-    const footer = document.getElementById("footer-placeholder");
-    if (header) observer.observe(header, { childList: true, subtree: true });
-    if (footer) observer.observe(footer, { childList: true, subtree: true });
-
-    // Apply immediately for main page content
-    applyLanguage(savedLang);
-  });
-
-  // --- Apply language translations ---
-  function applyLanguage(lang) {
-    fetch(`lang/${lang}.json`)
-      .then((response) => response.json())
-      .then((translations) => {
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-          const key = el.getAttribute("data-i18n");
-          if (translations[key]) el.textContent = translations[key];
-        });
-      })
-      .catch((error) => console.error("Translation load error:", error));
-  }
-
-  // --- When user selects a language ---
-  document.querySelectorAll(".lang-modal-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const selectedLang = btn.getAttribute("data-lang");
-      localStorage.setItem("selectedLanguage", selectedLang); // Save selection
-      applyLanguage(selectedLang); // Apply immediately
-
-      // Re-apply after header/footer reload (if reloaded by navigation)
-      const header = document.getElementById("header-placeholder");
-      const footer = document.getElementById("footer-placeholder");
-      if (header) header.addEventListener("DOMSubtreeModified", () => applyLanguage(selectedLang));
-      if (footer) footer.addEventListener("DOMSubtreeModified", () => applyLanguage(selectedLang));
-
-      langModal.classList.add("hidden");
+    // Handle hash changes
+    window.addEventListener("hashchange", () => {
+        if (allProducts.length > 0) {
+            const modal = safeQuerySelector("#product-modal");
+            handleProductHash(allProducts, modal);
+        }
     });
-  });
-const defaultLang = 'ko';
-let currentLang = localStorage.getItem('lang') || defaultLang;
-
-// Ensure the selected language persists
-document.addEventListener('DOMContentLoaded', () => {
-  loadLanguage(currentLang);
-  localStorage.setItem('lang', currentLang);
 });
